@@ -1,0 +1,28 @@
+%%{init: {'theme':'default', 'themeVariables': { 'primaryColor':'#fff','primaryTextColor':'#000','primaryBorderColor':'#000','lineColor':'#000','secondaryColor':'#f4f4f4','tertiaryColor':'#fff'}}}%%
+flowchart TD
+    Start([Bắt Đầu]) --> SelectItem[Chọn Mặt Hàng]
+    SelectItem --> SelectWh[Chọn Kho]
+    SelectWh --> SelectPeriod[Chọn Khoảng Thời Gian]
+    
+    SelectPeriod --> LoadCard[Load Thẻ Kho]
+    LoadCard --> ShowData[Hiển Thị Dữ Liệu]
+    
+    ShowData --> ShowDate[Ngày Ghi]
+    ShowData --> ShowIn[Số Nhập]
+    ShowData --> ShowOut[Số Xuất]
+    ShowData --> ShowBal[Số Tồn]
+    ShowData --> ShowRef[Chứng Từ]
+    
+    ShowRef --> ViewDoc{Xem Chi Tiết?}
+    ViewDoc -->|Phiếu Nhập| OpenIn[Mở Phiếu Nhập]
+    ViewDoc -->|Phiếu Xuất| OpenEx[Mở Phiếu Xuất]
+    ViewDoc -->|Kiểm Kê| OpenST[Mở Phiếu Kiểm Kê]
+    ViewDoc -->|Không| Export{Xuất Báo Cáo?}
+    
+    OpenIn --> Export
+    OpenEx --> Export
+    OpenST --> Export
+    
+    Export -->|Có| Print[In/Xuất PDF]
+    Export -->|Không| End([Kết Thúc])
+    Print --> End

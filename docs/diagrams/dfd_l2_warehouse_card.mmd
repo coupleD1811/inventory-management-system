@@ -1,0 +1,31 @@
+%%{init: {'theme':'default', 'themeVariables': { 'primaryColor':'#fff','primaryTextColor':'#000','primaryBorderColor':'#000','lineColor':'#000','secondaryColor':'#f4f4f4','tertiaryColor':'#fff'}}}%%
+flowchart TD
+    %% External Entities
+    E1[Staff/Manager]
+    
+    %% Processes
+    P1[P6.1.1<br/>Query Transactions]
+    P2[P6.1.2<br/>Calculate Balance]
+    P3[P6.1.3<br/>Format Display]
+    P4[P6.1.4<br/>Link Documents]
+    
+    %% Data Stores
+    D1[(D1: Transactions)]
+    D2[(D2: Imports)]
+    D3[(D3: Exports)]
+    D4[(D4: Products)]
+    
+    %% Flows
+    E1 -->|Warehouse + Product + Date| P1
+    P1 -->|Query| D1
+    D1 -->|Trans list| P1
+    
+    P1 -->|Trans data| P2
+    P2 -->|Running balance| P3
+    
+    P3 -->|Format| P4
+    D2 -->|Import docs| P4
+    D3 -->|Export docs| P4
+    D4 -->|Product info| P4
+    
+    P4 -->|Card report| E1

@@ -1,0 +1,28 @@
+%%{init: {'theme':'default', 'themeVariables': { 'primaryColor':'#fff','primaryTextColor':'#000','primaryBorderColor':'#000','lineColor':'#000','secondaryColor':'#f4f4f4','tertiaryColor':'#fff'}}}%%
+flowchart TD
+    subgraph Manager[Người Quản Lý Kho]
+        Start([Bắt Đầu]) --> SelectType{Chọn Loại}
+        SelectType -->|Nhập Kho| CreateIn[Lập Phiếu Nhập]
+        SelectType -->|Xuất Kho| CreateEx[Lập Phiếu Xuất]
+        
+        CreateIn --> AddItems[Thêm Hàng Hóa]
+        CreateEx --> AddItems
+        
+        AddItems --> Save[Lưu Phiếu]
+        Save --> Approve{Duyệt Phiếu?}
+        Approve -->|Không| Pending[Chờ Xử Lý]
+        Approve -->|Có| Approved[Đã Duyệt]
+    end
+    
+    subgraph Staff[Thủ Kho]
+        Approved --> Execute[Thực Hiện Nhập/Xuất]
+        Execute --> CheckActual[Kiểm Tra Thực Tế]
+        CheckActual --> Confirm[Xác Nhận Hoàn Thành]
+    end
+    
+    subgraph System[Hệ Thống]
+        Confirm --> UpdateInv[Cập Nhật Tồn Kho]
+        UpdateInv --> UpdateCard[Ghi Thẻ Kho]
+        UpdateCard --> Log[Ghi Log Giao Dịch]
+        Log --> End([Kết Thúc])
+    end

@@ -1,0 +1,49 @@
+/* Custom styles for QLKHO */
+
+.avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+.card-sm {
+    transition: transform 0.2s;
+}
+
+.card-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.alert-icon {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+/* Sidebar active state */
+.navbar-nav .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Table responsive */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Print styles */
+@media print {
+    .page-header,
+    .navbar,
+    .btn,
+    .d-print-none {
+        display: none !important;
+    }
+    
+    .page-wrapper {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}

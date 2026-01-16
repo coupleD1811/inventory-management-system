@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /qlkho-php-thuan/
+    
+    # Allow direct access to existing files
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+    
+    # Redirect all non-file requests to public/index.php
+    RewriteRule ^(.*)$ public/index.php?url=$1 [QSA,L]
+</IfModule>

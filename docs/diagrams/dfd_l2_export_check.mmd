@@ -1,0 +1,25 @@
+%%{init: {'theme':'default', 'themeVariables': { 'primaryColor':'#fff','primaryTextColor':'#000','primaryBorderColor':'#000','lineColor':'#000','secondaryColor':'#f4f4f4','tertiaryColor':'#fff'}}}%%
+flowchart TD
+    %% External Entities
+    E1[Manager]
+    
+    %% Processes
+    P1[P4.3.1<br/>Get Current Stock]
+    P2[P4.3.2<br/>Calculate Available]
+    P3[P4.3.3<br/>Validate Quantity]
+    
+    %% Data Stores
+    D1[(D1: Inventory)]
+    D2[(D2: Export_Details)]
+    
+    %% Flows
+    E1 -->|Product + Warehouse| P1
+    P1 -->|Query| D1
+    D1 -->|Current qty| P1
+    
+    P1 -->|Stock data| P2
+    D2 -->|Pending exports| P2
+    P2 -->|Available qty| P3
+    
+    E1 -->|Requested qty| P3
+    P3 -->|Valid/Invalid| E1
