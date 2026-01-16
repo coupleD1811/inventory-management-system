@@ -1,0 +1,41 @@
+%%{init: {'theme':'default', 'themeVariables': { 'primaryColor':'#fff','primaryTextColor':'#000','primaryBorderColor':'#000','lineColor':'#000','secondaryColor':'#f4f4f4','tertiaryColor':'#fff'}}}%%
+flowchart TD
+    %% External Entities
+    E1[Manager]
+    E2[Staff]
+    
+    %% Processes
+    P1[P4.1<br/>Tạo Phiếu Xuất]
+    P2[P4.2<br/>Thêm Chi Tiết]
+    P3[P4.3<br/>Kiểm Tra Tồn]
+    P4[P4.4<br/>Duyệt Phiếu]
+    P5[P4.5<br/>Trừ Tồn Kho]
+    
+    %% Data Stores
+    D1[(D1: Exports)]
+    D2[(D2: Export_Details)]
+    D3[(D3: Inventory)]
+    D4[(D4: Products)]
+    
+    %% Flows
+    E1 -->|Tạo phiếu| P1
+    P1 -->|Lưu| D1
+    
+    E1 -->|Thêm SP| P2
+    D4 -->|Product info| P2
+    P2 -->|Check| P3
+    D3 -->|Tồn hiện tại| P3
+    P3 -->|Valid| P2
+    P2 -->|Lưu chi tiết| D2
+    
+    E1 -->|Duyệt| P4
+    D1 --> P4
+    D2 --> P4
+    P4 -->|Update status| D1
+    
+    P4 -->|Trigger| P5
+    D2 --> P5
+    P5 -->|Trừ qty| D3
+    
+    D1 -->|Phiếu chờ| E2
+    P5 -->|Hoàn thành| E1

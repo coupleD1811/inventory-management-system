@@ -1,0 +1,28 @@
+%%{init: {'theme':'default', 'themeVariables': { 'primaryColor':'#fff','primaryTextColor':'#000','primaryBorderColor':'#000','lineColor':'#000','secondaryColor':'#f4f4f4','tertiaryColor':'#fff'}}}%%
+flowchart TD
+    subgraph Manager[Người Quản Lý Kho]
+        Start([Bắt Đầu]) --> CreateST[Lập Phiếu Kiểm Kê]
+        CreateST --> SelectWh[Chọn Kho]
+        SelectWh --> LoadSys[Load Tồn Hệ Thống]
+        LoadSys --> RequestCount[Yêu Cầu Kiểm Đếm]
+    end
+    
+    subgraph Staff[Thủ Kho]
+        RequestCount --> Count[Kiểm Đếm Thực Tế]
+        Count --> InputReal[Nhập SL Thực Tế]
+        InputReal --> ConfirmCount[Xác Nhận Số Liệu]
+    end
+    
+    subgraph Manager2[Người Quản Lý Kho]
+        ConfirmCount --> Review{Xem Chênh Lệch}
+        Review -->|Sai Sót| Recount[Yêu Cầu Đếm Lại]
+        Recount --> Count
+        Review -->|Chấp Nhận| Approve{Duyệt Kết Quả?}
+        Approve -->|Có| ProcessAdj[Xử Lý Điều Chỉnh]
+    end
+    
+    subgraph System[Hệ Thống]
+        ProcessAdj --> AdjInv[Điều Chỉnh Tồn Kho]
+        AdjInv --> SaveLog[Lưu Biên Bản]
+        SaveLog --> End([Hoàn Thành])
+    end

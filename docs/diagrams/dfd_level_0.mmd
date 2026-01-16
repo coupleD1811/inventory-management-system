@@ -1,0 +1,9 @@
+%%{init: {'theme':'default', 'themeVariables': { 'primaryColor':'#fff','primaryTextColor':'#000','primaryBorderColor':'#000','lineColor':'#000','secondaryColor':'#f4f4f4','tertiaryColor':'#fff'}}}%%
+graph LR
+    E1[Người Quản Lý Kho] -->|Tạo phiếu, quản lý| System((HỆ THỐNG<br/>QUẢN LÝ KHO))
+    E2[Thủ Kho] -->|Thực hiện nhập/xuất/kiểm kê| System
+    E3[Ban Giám Đốc] -->|Xem báo cáo| System
+    
+    System -->|Phiếu đã lập| E1
+    System -->|Phiếu cần thực hiện| E2
+    System -->|Báo cáo định kỳ| E3

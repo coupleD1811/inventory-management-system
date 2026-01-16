@@ -1,0 +1,35 @@
+%%{init: {'theme':'default', 'themeVariables': { 'primaryColor':'#fff','primaryTextColor':'#000','primaryBorderColor':'#000','lineColor':'#000','secondaryColor':'#f4f4f4','tertiaryColor':'#fff'}}}%%
+flowchart TD
+    %% External Entities
+    E1[Manager]
+    
+    %% Processes
+    P1[P2.1<br/>Quản Lý<br/>Danh Mục SP]
+    P2[P2.2<br/>Quản Lý<br/>Sản Phẩm]
+    P3[P2.3<br/>Quản Lý<br/>Kho]
+    P4[P2.4<br/>Quản Lý<br/>Nhà Cung Cấp]
+    
+    %% Data Stores
+    D1[(D1: Categories)]
+    D2[(D2: Products)]
+    D3[(D3: Warehouses)]
+    D4[(D4: Suppliers)]
+    
+    %% Flows
+    E1 -->|CRUD Category| P1
+    P1 <--> D1
+    
+    E1 -->|CRUD Product| P2
+    P2 <--> D2
+    D1 --> P2
+    
+    E1 -->|CRUD Warehouse| P3
+    P3 <--> D3
+    
+    E1 -->|CRUD Supplier| P4
+    P4 <--> D4
+    
+    P1 -->|Category list| E1
+    P2 -->|Product list| E1
+    P3 -->|Warehouse list| E1
+    P4 -->|Supplier list| E1

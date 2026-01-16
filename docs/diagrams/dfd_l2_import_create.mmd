@@ -1,0 +1,25 @@
+%%{init: {'theme':'default', 'themeVariables': { 'primaryColor':'#fff','primaryTextColor':'#000','primaryBorderColor':'#000','lineColor':'#000','secondaryColor':'#f4f4f4','tertiaryColor':'#fff'}}}%%
+flowchart TD
+    %% External Entities
+    E1[Manager]
+    
+    %% Processes
+    P1[P3.1.1<br/>Validate Input]
+    P2[P3.1.2<br/>Generate Code]
+    P3[P3.1.3<br/>Save Import]
+    
+    %% Data Stores
+    D1[(D1: Imports)]
+    D2[(D2: Warehouses)]
+    D3[(D3: Suppliers)]
+    
+    %% Flows
+    E1 -->|Import data| P1
+    D2 -->|Warehouse info| P1
+    D3 -->|Supplier info| P1
+    
+    P1 -->|Valid data| P2
+    P2 -->|Auto code| P3
+    P3 -->|Insert| D1
+    
+    D1 -->|Import ID| E1

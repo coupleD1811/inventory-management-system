@@ -1,0 +1,28 @@
+%%{init: {'theme':'default', 'themeVariables': { 'primaryColor':'#fff','primaryTextColor':'#000','primaryBorderColor':'#000','lineColor':'#000','secondaryColor':'#f4f4f4','tertiaryColor':'#fff'}}}%%
+graph TD
+    Dashboard[Trang Chủ Dashboard] --> G1[Quản Lý Hệ Thống]
+    Dashboard --> G2[Quản Lý Danh Mục]
+    Dashboard --> G3[Nghiệp Vụ Kho]
+    Dashboard --> G4[Báo Cáo & Thẻ Kho]
+
+    G1 --> G1A[Phân Quyền]
+    G1 --> G1B[Đăng Xuất]
+
+    G2 --> G2A[Danh Mục Sản Phẩm]
+    G2 --> G2B[Danh Mục Kho]
+    
+    G3 --> G3A[Nhập Kho]
+    G3 --> G3B[Xuất Kho]
+    G3 --> G3C[Kiểm Kê]
+    
+    G3A --> G3A1[Kho Vật Tư]
+    G3A --> G3A2[Kho Thành Phẩm]
+    
+    G3B --> G3B1[Kho Vật Tư]
+    G3B --> G3B2[Kho Thành Phẩm]
+    
+    G3C --> G3C1[Kho Vật Tư]
+    G3C --> G3C2[Kho Thành Phẩm]
+
+    G4 --> G4A[Thẻ Kho]
+    G4 --> G4B[Báo Cáo Tổng Hợp]

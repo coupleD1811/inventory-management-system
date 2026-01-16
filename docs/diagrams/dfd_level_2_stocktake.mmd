@@ -1,0 +1,18 @@
+%%{init: {'theme':'default', 'themeVariables': { 'primaryColor':'#fff','primaryTextColor':'#000','primaryBorderColor':'#000','lineColor':'#000','secondaryColor':'#f4f4f4','tertiaryColor':'#fff'}}}%%
+flowchart TD
+    Manager[Người Quản Lý] -->|1. Tạo phiếu| P41[P4.1<br/>Tạo Phiếu KB]
+    D2[(D2: Kho)] -->|Info| P41
+    D5[(D5: Tồn kho)] -->|System Qty| P41
+    
+    P41 -->|Yêu cầu| Staff[Thủ Kho]
+    Staff -->|2. Kiểm đếm| P42[P4.2<br/>Nhập SL Thực]
+    
+    P42 -->|Actual Qty| P43[P4.3<br/>Tính Chênh Lệch]
+    P43 -->|Variance| P44[P4.4<br/>Tổng Hợp]
+    
+    P44 -->|3. Kết quả| Manager
+    Manager -->|4. Duyệt| P45[P4.5<br/>Duyệt & Điều Chỉnh]
+    
+    P45 -->|Update| D5
+    P45 -->|Save| D6[(D6: Biên bản)]
+    P45 -->|Log| D4[(D4: Thẻ kho)]

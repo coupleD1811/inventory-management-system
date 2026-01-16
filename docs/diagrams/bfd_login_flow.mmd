@@ -1,0 +1,19 @@
+%%{init: {'theme':'default', 'themeVariables': { 'primaryColor':'#fff','primaryTextColor':'#000','primaryBorderColor':'#000','lineColor':'#000','secondaryColor':'#f4f4f4','tertiaryColor':'#fff'}}}%%
+flowchart TD
+    Start([Bắt Đầu]) --> Login[Nhập Username/Password]
+    Login --> Validate{Xác Thực}
+    Validate -->|Sai| Error[Thông Báo Lỗi]
+    Error --> Login
+    Validate -->|Đúng| CheckRole{Kiểm Tra Quyền}
+    CheckRole -->|Admin| AdminDash[Dashboard Admin]
+    CheckRole -->|Manager| ManagerDash[Dashboard Quản Lý]
+    CheckRole -->|Staff| StaffDash[Dashboard Thủ Kho]
+    
+    AdminDash --> AllFunc[Toàn Bộ Chức Năng]
+    ManagerDash --> MgrFunc[Duyệt Phiếu, Báo Cáo]
+    StaffDash --> StaffFunc[Nhập/Xuất/Kiểm Kê]
+    
+    AllFunc --> Logout[Đăng Xuất]
+    MgrFunc --> Logout
+    StaffFunc --> Logout
+    Logout --> End([Kết Thúc])

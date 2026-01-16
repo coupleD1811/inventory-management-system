@@ -1,0 +1,32 @@
+%%{init: {'theme':'default', 'themeVariables': { 'primaryColor':'#fff','primaryTextColor':'#000','primaryBorderColor':'#000','lineColor':'#000','secondaryColor':'#f4f4f4','tertiaryColor':'#fff'}}}%%
+flowchart TD
+    %% External Entities
+    E1[Manager]
+    E2[Staff]
+    
+    %% Processes
+    P1[P5.1.1<br/>Load System Stock]
+    P2[P5.1.2<br/>Input Actual Count]
+    P3[P5.1.3<br/>Calculate Variance]
+    P4[P5.1.4<br/>Save Details]
+    
+    %% Data Stores
+    D1[(D1: Inventory)]
+    D2[(D2: StockTake_Details)]
+    D3[(D3: Products)]
+    
+    %% Flows
+    E1 -->|Warehouse ID| P1
+    P1 -->|Query| D1
+    D1 -->|System qty| P1
+    D3 -->|Product info| P1
+    
+    P1 -->|Stock list| E2
+    E2 -->|Actual count| P2
+    P2 -->|Actual qty| P3
+    P1 -->|System qty| P3
+    
+    P3 -->|Variance| P4
+    P4 -->|Insert| D2
+    
+    P4 -->|Summary| E1
