@@ -46,6 +46,29 @@
 
                 <div class="collapse navbar-collapse" id="sidebar-menu">
                     <ul class="navbar-nav pt-lg-3">
+                        <?php if (Auth::isAdmin()): ?>
+                            <?php if (Auth::hasPermission('role.view')): ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?= BASE_URL ?>role">
+                                        <span class="nav-link-icon d-lg-inline-block">
+                                            <i class="ti ti-shield"></i>
+                                        </span>
+                                        <span class="nav-link-title">Phân quyền</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if (Auth::hasPermission('user.view')): ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?= BASE_URL ?>user">
+                                        <span class="nav-link-icon d-lg-inline-block">
+                                            <i class="ti ti-users"></i>
+                                        </span>
+                                        <span class="nav-link-title">Người dùng</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        <?php else: ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?= BASE_URL ?>home">
                                 <span class="nav-link-icon d-lg-inline-block">
@@ -187,26 +210,6 @@
                             </li>
                         <?php endif; ?>
 
-                        <?php if (Auth::hasPermission('role.view')): ?>
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?= BASE_URL ?>role">
-                                    <span class="nav-link-icon d-lg-inline-block">
-                                        <i class="ti ti-shield"></i>
-                                    </span>
-                                    <span class="nav-link-title">Phân quyền</span>
-                                </a>
-                            </li>
-                        <?php endif; ?>
-
-                        <?php if (Auth::hasPermission('user.view')): ?>
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?= BASE_URL ?>user">
-                                    <span class="nav-link-icon d-lg-inline-block">
-                                        <i class="ti ti-users"></i>
-                                    </span>
-                                    <span class="nav-link-title">Người dùng</span>
-                                </a>
-                            </li>
                         <?php endif; ?>
                     </ul>
                 </div>
