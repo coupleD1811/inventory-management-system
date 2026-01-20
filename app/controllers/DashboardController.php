@@ -53,10 +53,11 @@ class DashboardController extends Controller
 
         // Get recent imports (last 7 days)
         $recentImports = $importModel->query("
-            SELECT i.*, w.name as warehouse_name, s.name as supplier_name
+            SELECT i.*, w.name as warehouse_name, COALESCE(wk.name, s.name) as supplier_name
             FROM imports i
             LEFT JOIN warehouses w ON i.warehouse_id = w.id
             LEFT JOIN suppliers s ON i.supplier_id = s.id
+            LEFT JOIN workshops wk ON i.workshop_id = wk.id
             WHERE i.import_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
             ORDER BY i.import_date DESC
             LIMIT 5

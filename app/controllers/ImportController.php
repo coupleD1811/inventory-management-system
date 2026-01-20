@@ -5,6 +5,7 @@ class ImportController extends Controller
     private $importModel;
     private $warehouseModel;
     private $supplierModel;
+    private $workshopModel;
 
     public function __construct()
     {
@@ -12,6 +13,7 @@ class ImportController extends Controller
         $this->importModel = $this->model('Import');
         $this->warehouseModel = $this->model('Warehouse');
         $this->supplierModel = $this->model('Supplier');
+        $this->workshopModel = $this->model('Workshop');
     }
 
     public function index()
@@ -50,6 +52,7 @@ class ImportController extends Controller
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $warehouseId = $_POST['warehouse_id'] ?? null;
             $supplierId = $_POST['supplier_id'] ?? null;
+            $workshopId = $_POST['workshop_id'] ?? null;
             $importDate = $_POST['import_date'] ?? date('Y-m-d');
             $notes = trim($_POST['notes'] ?? '');
             $status = 'pending';
@@ -67,6 +70,7 @@ class ImportController extends Controller
                     'title' => 'Tạo phiếu nhập',
                     'warehouses' => $warehouses,
                     'suppliers' => $this->supplierModel->getAllActive(),
+                    'workshops' => $this->workshopModel->getAllActive(),
                     'old' => $_POST
                 ]);
                 return;
@@ -75,10 +79,14 @@ class ImportController extends Controller
             // Tự động tạo mã phiếu
             $code = $this->generateImportCode($importDate);
 
+            $warehouse = $this->warehouseModel->find($warehouseId);
+            $isFinished = $warehouse && $warehouse['code'] === 'KHO-TP';
+
             $data = [
                 'code' => $code,
                 'warehouse_id' => $warehouseId,
-                'supplier_id' => $supplierId,
+                'supplier_id' => $isFinished ? null : $supplierId,
+                'workshop_id' => $isFinished ? $workshopId : null,
                 'import_date' => $importDate,
                 'total_amount' => 0,
                 'status' => $status,
@@ -105,7 +113,8 @@ class ImportController extends Controller
         $this->view('import/create', [
             'title' => 'Tạo phiếu nhập',
             'warehouses' => $warehouses,
-            'suppliers' => $this->supplierModel->getAllActive()
+            'suppliers' => $this->supplierModel->getAllActive(),
+            'workshops' => $this->workshopModel->getAllActive()
         ]);
     }
 

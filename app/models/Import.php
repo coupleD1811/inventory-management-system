@@ -6,10 +6,14 @@ class Import extends Model
 
     public function getAllWithDetails()
     {
-        $sql = "SELECT i.*, w.name as warehouse_name, s.name as supplier_name, u.full_name as created_by_name
+        $sql = "SELECT i.*, w.name as warehouse_name,
+                       COALESCE(wk.name, s.name) as supplier_name,
+                       wk.name as workshop_name,
+                       u.full_name as created_by_name
                 FROM {$this->table} i
                 LEFT JOIN warehouses w ON i.warehouse_id = w.id
                 LEFT JOIN suppliers s ON i.supplier_id = s.id
+                LEFT JOIN workshops wk ON i.workshop_id = wk.id
                 LEFT JOIN users u ON i.created_by = u.id
                 ORDER BY i.id DESC";
         return $this->query($sql);
@@ -17,10 +21,14 @@ class Import extends Model
 
     public function getWithDetails($id)
     {
-        $sql = "SELECT i.*, w.name as warehouse_name, s.name as supplier_name, u.full_name as created_by_name
+        $sql = "SELECT i.*, w.name as warehouse_name,
+                       COALESCE(wk.name, s.name) as supplier_name,
+                       wk.name as workshop_name,
+                       u.full_name as created_by_name
                 FROM {$this->table} i
                 LEFT JOIN warehouses w ON i.warehouse_id = w.id
                 LEFT JOIN suppliers s ON i.supplier_id = s.id
+                LEFT JOIN workshops wk ON i.workshop_id = wk.id
                 LEFT JOIN users u ON i.created_by = u.id
                 WHERE i.id = ?";
         $result = $this->query($sql, [$id]);
@@ -29,22 +37,29 @@ class Import extends Model
 
     public function search($keyword)
     {
-        $sql = "SELECT i.*, w.name as warehouse_name, s.name as supplier_name
+        $sql = "SELECT i.*, w.name as warehouse_name,
+                       COALESCE(wk.name, s.name) as supplier_name,
+                       wk.name as workshop_name
                 FROM {$this->table} i
                 LEFT JOIN warehouses w ON i.warehouse_id = w.id
                 LEFT JOIN suppliers s ON i.supplier_id = s.id
-                WHERE i.code LIKE ? OR s.name LIKE ?
+                LEFT JOIN workshops wk ON i.workshop_id = wk.id
+                WHERE i.code LIKE ? OR s.name LIKE ? OR wk.name LIKE ?
                 ORDER BY i.id DESC";
         $param = "%{$keyword}%";
-        return $this->query($sql, [$param, $param]);
+        return $this->query($sql, [$param, $param, $param]);
     }
 
     public function getByDateRange($startDate, $endDate)
     {
-        $sql = "SELECT i.*, w.name as warehouse_name, s.name as supplier_name, u.full_name as created_by_name
+        $sql = "SELECT i.*, w.name as warehouse_name,
+                       COALESCE(wk.name, s.name) as supplier_name,
+                       wk.name as workshop_name,
+                       u.full_name as created_by_name
                 FROM {$this->table} i
                 LEFT JOIN warehouses w ON i.warehouse_id = w.id
                 LEFT JOIN suppliers s ON i.supplier_id = s.id
+                LEFT JOIN workshops wk ON i.workshop_id = wk.id
                 LEFT JOIN users u ON i.created_by = u.id
                 WHERE i.import_date BETWEEN ? AND ?
                 ORDER BY i.import_date DESC";
@@ -57,7 +72,7 @@ class Import extends Model
                     COUNT(*) as total_imports,
                     SUM(total_amount) as total_value,
                     SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved_imports,
-                    COUNT(DISTINCT supplier_id) as total_suppliers
+                    COUNT(DISTINCT COALESCE(supplier_id, workshop_id)) as total_suppliers
                 FROM {$this->table}
                 WHERE import_date BETWEEN ? AND ?";
         $result = $this->query($sql, [$startDate, $endDate]);
