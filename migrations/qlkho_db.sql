@@ -145,6 +145,7 @@ CREATE TABLE `imports` (
   `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `warehouse_id` int NOT NULL,
   `supplier_id` int DEFAULT NULL,
+  `workshop_id` int DEFAULT NULL,
   `import_date` date NOT NULL,
   `total_amount` decimal(15,2) DEFAULT '0.00',
   `status` enum('draft','pending','approved','completed','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'draft',
@@ -160,8 +161,8 @@ CREATE TABLE `imports` (
 -- Đang đổ dữ liệu cho bảng `imports`
 --
 
-INSERT INTO `imports` (`id`, `code`, `warehouse_id`, `supplier_id`, `import_date`, `total_amount`, `status`, `created_by`, `approved_by`, `approved_at`, `notes`, `created_at`, `updated_at`) VALUES
-(1, 'PN-20260115-001', 7, 2, '2026-01-15', 2400000.00, 'approved', 1, 1, '2026-01-15 10:59:57', '', '2026-01-15 03:55:48', '2026-01-15 03:59:57');
+INSERT INTO `imports` (`id`, `code`, `warehouse_id`, `supplier_id`, `workshop_id`, `import_date`, `total_amount`, `status`, `created_by`, `approved_by`, `approved_at`, `notes`, `created_at`, `updated_at`) VALUES
+(1, 'PN-20260115-001', 7, 2, NULL, '2026-01-15', 2400000.00, 'approved', 1, 1, '2026-01-15 10:59:57', '', '2026-01-15 03:55:48', '2026-01-15 03:59:57');
 
 -- --------------------------------------------------------
 
@@ -828,6 +829,7 @@ ALTER TABLE `imports`
   ADD UNIQUE KEY `code` (`code`),
   ADD KEY `warehouse_id` (`warehouse_id`),
   ADD KEY `supplier_id` (`supplier_id`),
+  ADD KEY `workshop_id` (`workshop_id`),
   ADD KEY `created_by` (`created_by`);
 
 --

@@ -28,13 +28,24 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label" id="supplierLabel">Nhà cung cấp</label>
+                            <div class="mb-3" id="supplierField">
+                                <label class="form-label">Nhà cung cấp</label>
                                 <select name="supplier_id" id="supplierSelect" class="form-select">
-                                    <option value="" id="supplierPlaceholder">-- Chọn nhà cung cấp --</option>
+                                    <option value="">-- Chọn nhà cung cấp --</option>
                                     <?php foreach ($suppliers as $sup): ?>
                                         <option value="<?= $sup['id'] ?>" <?= ($old['supplier_id'] ?? '') == $sup['id'] ? 'selected' : '' ?>>
                                             <?= htmlspecialchars($sup['name']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="mb-3" id="workshopField" style="display: none;">
+                                <label class="form-label">Phân xưởng</label>
+                                <select name="workshop_id" id="workshopSelect" class="form-select">
+                                    <option value="">-- Chọn phân xưởng --</option>
+                                    <?php foreach ($workshops as $workshop): ?>
+                                        <option value="<?= $workshop['id'] ?>" <?= ($old['workshop_id'] ?? '') == $workshop['id'] ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($workshop['name']) ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -80,18 +91,25 @@
 <script>
     (function () {
         const warehouseSelect = document.getElementById('warehouseSelect');
-        const supplierLabel = document.getElementById('supplierLabel');
-        const supplierPlaceholder = document.getElementById('supplierPlaceholder');
+        const supplierField = document.getElementById('supplierField');
+        const workshopField = document.getElementById('workshopField');
+        const supplierSelect = document.getElementById('supplierSelect');
+        const workshopSelect = document.getElementById('workshopSelect');
 
-        function syncSupplierLabel() {
+        function syncSourceField() {
             const selected = warehouseSelect.options[warehouseSelect.selectedIndex];
             const isFinished = selected && selected.dataset.code === 'KHO-TP';
-            supplierLabel.textContent = isFinished ? 'Phân xưởng' : 'Nhà cung cấp';
-            supplierPlaceholder.textContent = isFinished ? '-- Chọn phân xưởng --' : '-- Chọn nhà cung cấp --';
+            supplierField.style.display = isFinished ? 'none' : '';
+            workshopField.style.display = isFinished ? '' : 'none';
+            if (isFinished) {
+                supplierSelect.value = '';
+            } else {
+                workshopSelect.value = '';
+            }
         }
 
-        warehouseSelect.addEventListener('change', syncSupplierLabel);
-        syncSupplierLabel();
+        warehouseSelect.addEventListener('change', syncSourceField);
+        syncSourceField();
     })();
 </script>
 

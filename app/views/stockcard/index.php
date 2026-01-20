@@ -7,12 +7,12 @@
                 <h3 class="card-title">Thẻ kho - Lịch sử giao dịch</h3>
             </div>
             <div class="card-body">
-                <form method="GET" class="mb-4">
+                <form method="GET" class="mb-4" id="stockcardFilterForm">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label required">Kho</label>
-                                <select name="warehouse_id" class="form-select" required>
+                                <select name="warehouse_id" id="warehouseSelect" class="form-select" required>
                                     <option value="">-- Chọn kho --</option>
                                     <?php foreach ($warehouses as $wh): ?>
                                         <option value="<?= $wh['id'] ?>" <?= $warehouseId == $wh['id'] ? 'selected' : '' ?>>
@@ -25,7 +25,7 @@
                         <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label required">Sản phẩm</label>
-                                <select name="product_id" class="form-select" required>
+                                <select name="product_id" id="productSelect" class="form-select" required>
                                     <option value="">-- Chọn sản phẩm --</option>
                                     <?php foreach ($products as $prod): ?>
                                         <option value="<?= $prod['id'] ?>" <?= $productId == $prod['id'] ? 'selected' : '' ?>>
@@ -57,6 +57,18 @@
                         </div>
                     </div>
                 </form>
+                <script>
+                    (function () {
+                        const form = document.getElementById('stockcardFilterForm');
+                        const warehouseSelect = document.getElementById('warehouseSelect');
+                        const productSelect = document.getElementById('productSelect');
+
+                        warehouseSelect.addEventListener('change', function () {
+                            productSelect.value = '';
+                            form.submit();
+                        });
+                    })();
+                </script>
 
                 <?php if ($product && $warehouse): ?>
                     <div class="card bg-light mb-4">
