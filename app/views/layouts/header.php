@@ -44,8 +44,22 @@
                     </div>
                 </div>
 
+                <?php
+                require_once '../app/models/Inventory.php';
+                require_once '../app/models/Warehouse.php';
+                ?>
                 <div class="collapse navbar-collapse" id="sidebar-menu">
                     <ul class="navbar-nav pt-lg-3">
+                        <?php
+                        $inventoryModel = new Inventory();
+                        $warningWarehouseId = Auth::isStorekeeper() ? Auth::getWarehouseId() : null;
+                        $warningSummary = $inventoryModel->getWarningSummary($warningWarehouseId);
+                        $warningIcon = $warningSummary === 'over'
+                            ? '<i class="ti ti-alert-triangle text-danger ms-1"></i>'
+                            : ($warningSummary === 'near'
+                                ? '<i class="ti ti-alert-triangle text-warning ms-1"></i>'
+                                : '');
+                        ?>
                         <?php if (Auth::isAdmin()): ?>
                             <?php if (Auth::hasPermission('role.view')): ?>
                                 <li class="nav-item">
@@ -79,38 +93,55 @@
                         </li>
 
                         <?php if (Auth::hasPermission('product.view')): ?>
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?= BASE_URL ?>product?warehouse_code=KHO-NNL">
-                                    <span class="nav-link-icon d-lg-inline-block">
-                                        <i class="ti ti-flame"></i>
-                                    </span>
-                                    <span class="nav-link-title">Kho nhiên liệu</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?= BASE_URL ?>product?warehouse_code=KHO-NL">
-                                    <span class="nav-link-icon d-lg-inline-block">
-                                        <i class="ti ti-leaf"></i>
-                                    </span>
-                                    <span class="nav-link-title">Kho nguyên liệu</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?= BASE_URL ?>product?warehouse_code=KHO-PT">
-                                    <span class="nav-link-icon d-lg-inline-block">
-                                        <i class="ti ti-settings"></i>
-                                    </span>
-                                    <span class="nav-link-title">Kho phụ tùng</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?= BASE_URL ?>product?warehouse_code=KHO-TP">
-                                    <span class="nav-link-icon d-lg-inline-block">
-                                        <i class="ti ti-package"></i>
-                                    </span>
-                                    <span class="nav-link-title">Kho thành phẩm</span>
-                                </a>
-                            </li>
+                            <?php if (Auth::isStorekeeper()): ?>
+                                <?php
+                                $warehouseModel = new Warehouse();
+                                $userWarehouse = $warehouseModel->find(Auth::getWarehouseId());
+                                ?>
+                                <?php if ($userWarehouse): ?>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="<?= BASE_URL ?>product?warehouse_code=<?= htmlspecialchars($userWarehouse['code']) ?>">
+                                            <span class="nav-link-icon d-lg-inline-block">
+                                                <i class="ti ti-building-warehouse"></i>
+                                            </span>
+                                            <span class="nav-link-title"><?= htmlspecialchars($userWarehouse['name']) ?></span>
+                                        </a>
+                                    </li>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?= BASE_URL ?>product?warehouse_code=KHO-NNL">
+                                        <span class="nav-link-icon d-lg-inline-block">
+                                            <i class="ti ti-flame"></i>
+                                        </span>
+                                        <span class="nav-link-title">Kho nhiên liệu</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?= BASE_URL ?>product?warehouse_code=KHO-NL">
+                                        <span class="nav-link-icon d-lg-inline-block">
+                                            <i class="ti ti-leaf"></i>
+                                        </span>
+                                        <span class="nav-link-title">Kho nguyên liệu</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?= BASE_URL ?>product?warehouse_code=KHO-PT">
+                                        <span class="nav-link-icon d-lg-inline-block">
+                                            <i class="ti ti-settings"></i>
+                                        </span>
+                                        <span class="nav-link-title">Kho phụ tùng</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?= BASE_URL ?>product?warehouse_code=KHO-TP">
+                                        <span class="nav-link-icon d-lg-inline-block">
+                                            <i class="ti ti-package"></i>
+                                        </span>
+                                        <span class="nav-link-title">Kho thành phẩm</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
                         <?php endif; ?>
 
                         <?php if (Auth::hasPermission('supplier.view')): ?>
@@ -169,13 +200,24 @@
                         <?php endif; ?>
 
 
-                        <?php if (Auth::hasPermission('report.view') || Auth::hasPermission('inventory.report') || Auth::hasPermission('report.profit_loss') || Auth::hasPermission('stock_card.view')): ?>
+                        <?php if (Auth::hasPermission('stock_card.view')): ?>
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= BASE_URL ?>stock_card">
+                                    <span class="nav-link-icon d-lg-inline-block">
+                                        <i class="ti ti-file-text"></i>
+                                    </span>
+                                    <span class="nav-link-title">Thẻ kho <?= $warningIcon ?></span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+
+                        <?php if (!Auth::isStorekeeper() && (Auth::hasPermission('report.view') || Auth::hasPermission('inventory.report') || Auth::hasPermission('report.profit_loss'))): ?>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#navbar-reports" data-bs-toggle="dropdown" role="button">
                                     <span class="nav-link-icon d-lg-inline-block">
                                         <i class="ti ti-chart-bar"></i>
                                     </span>
-                                    <span class="nav-link-title">Báo cáo</span>
+                                    <span class="nav-link-title">Báo cáo <?= $warningIcon ?></span>
                                 </a>
                                 <div class="dropdown-menu">
                                     <?php if (Auth::hasPermission('inventory.report')): ?>
@@ -194,11 +236,6 @@
                                     <?php if (Auth::hasPermission('report.profit_loss')): ?>
                                         <a class="dropdown-item" href="<?= BASE_URL ?>report/profitLoss">
                                             <i class="ti ti-chart-line me-2"></i>Báo cáo Lời/Lỗ
-                                        </a>
-                                    <?php endif; ?>
-                                    <?php if (Auth::hasPermission('stock_card.view')): ?>
-                                        <a class="dropdown-item" href="<?= BASE_URL ?>stock_card">
-                                            <i class="ti ti-file-text me-2"></i>Thẻ kho
                                         </a>
                                     <?php endif; ?>
                                     <!-- BÁO CÁO GIAO DỊCH ĐÃ BỊ TẮT

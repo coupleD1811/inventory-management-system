@@ -6,7 +6,8 @@ class ExportDetail extends Model
 
     public function getByExport($exportId)
     {
-        $sql = "SELECT ed.*, p.code as product_code, p.name as product_name, p.unit
+        $sql = "SELECT ed.*, p.code as product_code, p.name as product_name, p.unit,
+                       p.min_stock, p.max_stock
                 FROM {$this->table} ed
                 INNER JOIN products p ON ed.product_id = p.id
                 WHERE ed.export_id = ?

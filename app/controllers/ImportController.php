@@ -165,15 +165,33 @@ class ImportController extends Controller
 
         $importDetailModel = $this->model('ImportDetail');
         $productModel = $this->model('Product');
+        $inventoryModel = $this->model('Inventory');
         
         $details = $importDetailModel->getByImport($id);
         $products = $productModel->getByWarehouse($import['warehouse_id']);
+        $detailWarnings = [];
+        if (!empty($details)) {
+            $productTotals = [];
+            foreach ($details as $detail) {
+                $productTotals[$detail['product_id']] = ($productTotals[$detail['product_id']] ?? 0) + $detail['quantity'];
+            }
+            foreach ($details as $detail) {
+                $currentQty = $inventoryModel->getQuantity($import['warehouse_id'], $detail['product_id']);
+                $projectedQty = $currentQty + ($productTotals[$detail['product_id']] ?? 0);
+                $detailWarnings[$detail['id']] = $inventoryModel->getWarningStatusForQuantity(
+                    $projectedQty,
+                    $detail['min_stock'] ?? 0,
+                    $detail['max_stock'] ?? 0
+                );
+            }
+        }
 
         $this->view('import/view', [
             'title' => 'Chi tiết phiếu nhập',
             'import' => $import,
             'details' => $details,
-            'products' => $products
+            'products' => $products,
+            'detailWarnings' => $detailWarnings
         ]);
     }
 

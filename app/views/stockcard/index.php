@@ -1,5 +1,10 @@
 <?php require_once '../app/views/layouts/header.php'; ?>
 
+<style>
+    select option.warning-near { color: #f1b000; }
+    select option.warning-over { color: #d63939; }
+</style>
+
 <div class="row row-cards">
     <div class="col-12">
         <div class="card">
@@ -7,6 +12,12 @@
                 <h3 class="card-title">Thẻ kho - Lịch sử giao dịch</h3>
             </div>
             <div class="card-body">
+                <?php if ($isStorekeeper): ?>
+                    <div class="alert alert-info mb-4">
+                        <i class="ti ti-info-circle me-2"></i>
+                        Hiển thị thẻ kho cho: <strong><?= htmlspecialchars($warehouse['name'] ?? '') ?></strong>
+                    </div>
+                <?php else: ?>
                 <form method="GET" class="mb-4" id="stockcardFilterForm">
                     <div class="row">
                         <div class="col-md-3">
@@ -15,8 +26,13 @@
                                 <select name="warehouse_id" id="warehouseSelect" class="form-select" required>
                                     <option value="">-- Chọn kho --</option>
                                     <?php foreach ($warehouses as $wh): ?>
-                                        <option value="<?= $wh['id'] ?>" <?= $warehouseId == $wh['id'] ? 'selected' : '' ?>>
-                                            <?= htmlspecialchars($wh['name']) ?>
+                                        <?php
+                                        $warning = $warehouseWarnings[$wh['id']] ?? null;
+                                        $suffix = $warning === 'over' ? ' (!!)' : ($warning === 'near' ? ' (!)' : '');
+                                        $warningClass = $warning === 'over' ? 'warning-over' : ($warning === 'near' ? 'warning-near' : '');
+                                        ?>
+                                        <option value="<?= $wh['id'] ?>" class="<?= $warningClass ?>" <?= $warehouseId == $wh['id'] ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($wh['name']) ?><?= $suffix ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -28,8 +44,13 @@
                                 <select name="product_id" id="productSelect" class="form-select" required>
                                     <option value="">-- Chọn sản phẩm --</option>
                                     <?php foreach ($products as $prod): ?>
-                                        <option value="<?= $prod['id'] ?>" <?= $productId == $prod['id'] ? 'selected' : '' ?>>
-                                            <?= htmlspecialchars($prod['code']) ?> - <?= htmlspecialchars($prod['name']) ?>
+                                        <?php
+                                        $warning = $productWarnings[$prod['id']] ?? null;
+                                        $suffix = $warning === 'over' ? ' (!!)' : ($warning === 'near' ? ' (!)' : '');
+                                        $warningClass = $warning === 'over' ? 'warning-over' : ($warning === 'near' ? 'warning-near' : '');
+                                        ?>
+                                        <option value="<?= $prod['id'] ?>" class="<?= $warningClass ?>" <?= $productId == $prod['id'] ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($prod['code']) ?> - <?= htmlspecialchars($prod['name']) ?><?= $suffix ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -69,8 +90,100 @@
                         });
                     })();
                 </script>
+                <?php endif; ?>
 
-                <?php if ($product && $warehouse): ?>
+                <?php if ($isStorekeeper): ?>
+                    <?php foreach ($stockCards as $card): ?>
+                        <?php
+                        $cardProduct = $card['product'];
+                        $cardTransactions = $card['transactions'];
+                        $warning = $productWarnings[$cardProduct['id']] ?? null;
+                        ?>
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h4 class="mb-0">
+                                        <?= htmlspecialchars($cardProduct['code']) ?> - <?= htmlspecialchars($cardProduct['name']) ?>
+                                        <?php if ($warning === 'near'): ?>
+                                            <i class="ti ti-alert-triangle text-warning ms-1" title="Gần vượt mức tồn kho"></i>
+                                        <?php elseif ($warning === 'over'): ?>
+                                            <i class="ti ti-alert-triangle text-danger ms-1" title="Vượt mức tồn kho"></i>
+                                        <?php endif; ?>
+                                    </h4>
+                                    <button onclick="window.print()" class="btn btn-success">
+                                        <i class="ti ti-file-export me-2"></i>Xuất báo cáo (In/PDF)
+                                    </button>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table table-vcenter card-table table-bordered">
+                                        <thead>
+                                            <tr class="bg-primary text-white">
+                                                <th>STT</th>
+                                                <th>Ngày</th>
+                                                <th>Loại</th>
+                                                <th>Số chứng từ</th>
+                                                <th class="text-end">Số lượng nhập</th>
+                                                <th class="text-end">Số lượng xuất</th>
+                                                <th class="text-end">Tồn kho</th>
+                                                <th>Người thực hiện</th>
+                                                <th>Ghi chú</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php if (empty($cardTransactions)): ?>
+                                                <tr>
+                                                    <td colspan="9" class="text-center text-muted">
+                                                        <i class="ti ti-file-off fs-1 mb-2"></i>
+                                                        <p>Không có giao dịch nào</p>
+                                                    </td>
+                                                </tr>
+                                            <?php else: ?>
+                                                <?php foreach ($cardTransactions as $index => $trans): ?>
+                                                    <tr>
+                                                        <td><?= $index + 1 ?></td>
+                                                        <td><?= date('d/m/Y H:i', strtotime($trans['transaction_date'])) ?></td>
+                                                        <td>
+                                                            <?php if ($trans['transaction_type'] === 'import'): ?>
+                                                                <span class="badge bg-success">Nhập</span>
+                                                            <?php else: ?>
+                                                                <span class="badge bg-danger">Xuất</span>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td>
+                                                            <a href="<?= BASE_URL ?><?= $trans['reference_type'] ?>/detail/<?= $trans['reference_id'] ?>">
+                                                                <?= htmlspecialchars($trans['reference_code']) ?>
+                                                            </a>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <?php if ($trans['transaction_type'] === 'import'): ?>
+                                                                <strong class="text-success">+<?= number_format($trans['quantity'], 2) ?></strong>
+                                                            <?php else: ?>
+                                                                -
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <?php if ($trans['transaction_type'] === 'export'): ?>
+                                                                <strong class="text-danger">-<?= number_format($trans['quantity'], 2) ?></strong>
+                                                            <?php else: ?>
+                                                                -
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <strong><?= number_format($trans['balance_after'], 2) ?></strong>
+                                                        </td>
+                                                        <td><?= htmlspecialchars($trans['created_by_name'] ?? '-') ?></td>
+                                                        <td><?= htmlspecialchars($trans['notes'] ?? '-') ?></td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php elseif ($product && $warehouse): ?>
                     <div class="card bg-light mb-4">
                         <div class="card-body">
                             <div class="row">

@@ -152,15 +152,33 @@ class ExportController extends Controller
 
         $exportDetailModel = $this->model('ExportDetail');
         $productModel = $this->model('Product');
+        $inventoryModel = $this->model('Inventory');
         
         $details = $exportDetailModel->getByExport($id);
         $products = $productModel->getByWarehouse($export['warehouse_id']);
+        $detailWarnings = [];
+        if (!empty($details)) {
+            $productTotals = [];
+            foreach ($details as $detail) {
+                $productTotals[$detail['product_id']] = ($productTotals[$detail['product_id']] ?? 0) + $detail['quantity'];
+            }
+            foreach ($details as $detail) {
+                $currentQty = $inventoryModel->getQuantity($export['warehouse_id'], $detail['product_id']);
+                $projectedQty = $currentQty - ($productTotals[$detail['product_id']] ?? 0);
+                $detailWarnings[$detail['id']] = $inventoryModel->getWarningStatusForQuantity(
+                    $projectedQty,
+                    $detail['min_stock'] ?? 0,
+                    $detail['max_stock'] ?? 0
+                );
+            }
+        }
 
         $this->view('export/view', [
             'title' => 'Chi tiết phiếu xuất',
             'export' => $export,
             'details' => $details,
-            'products' => $products
+            'products' => $products,
+            'detailWarnings' => $detailWarnings
         ]);
     }
 
