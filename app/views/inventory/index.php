@@ -59,7 +59,7 @@
                             <?php else: ?>
                                 <?php foreach ($inventory as $index => $item): ?>
                                     <tr>
-                                        <td><?= $index + 1 ?></td>
+                                        <td><?= (($page - 1) * $perPage) + $index + 1 ?></td>
                                         <td><strong><?= htmlspecialchars($item['warehouse_name']) ?></strong></td>
                                         <td><?= htmlspecialchars($item['product_code']) ?></td>
                                         <td><?= htmlspecialchars($item['product_name']) ?></td>
@@ -106,6 +106,39 @@
                         </tbody>
                     </table>
                 </div>
+                <?php
+                $totalPages = (int)ceil(($total ?? 0) / ($perPage ?? 15));
+                if ($totalPages > 1):
+                    $query = $_GET;
+                ?>
+                    <nav aria-label="Pagination">
+                        <ul class="pagination justify-content-end">
+                            <?php
+                            $query['page'] = max(1, $page - 1);
+                            $prevUrl = BASE_URL . 'inventory?' . http_build_query($query);
+                            ?>
+                            <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
+                                <a class="page-link" href="<?= $prevUrl ?>" tabindex="-1">Trước</a>
+                            </li>
+                            <?php for ($p = 1; $p <= $totalPages; $p++): ?>
+                                <?php
+                                $query['page'] = $p;
+                                $pageUrl = BASE_URL . 'inventory?' . http_build_query($query);
+                                ?>
+                                <li class="page-item <?= $p == $page ? 'active' : '' ?>">
+                                    <a class="page-link" href="<?= $pageUrl ?>"><?= $p ?></a>
+                                </li>
+                            <?php endfor; ?>
+                            <?php
+                            $query['page'] = min($totalPages, $page + 1);
+                            $nextUrl = BASE_URL . 'inventory?' . http_build_query($query);
+                            ?>
+                            <li class="page-item <?= $page >= $totalPages ? 'disabled' : '' ?>">
+                                <a class="page-link" href="<?= $nextUrl ?>">Sau</a>
+                            </li>
+                        </ul>
+                    </nav>
+                <?php endif; ?>
             </div>
         </div>
     </div>

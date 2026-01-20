@@ -33,7 +33,7 @@ class Inventory extends Model
                 FROM {$this->table} i
                 INNER JOIN products p ON i.product_id = p.id
                 INNER JOIN warehouses w ON i.warehouse_id = w.id
-                ORDER BY w.name, p.name";
+                ORDER BY i.updated_at DESC, i.id DESC";
         return $this->query($sql);
     }
 
@@ -93,9 +93,81 @@ class Inventory extends Model
             $params[] = "%{$keyword}%";
         }
         
-        $sql .= " ORDER BY w.name, p.name";
+        $sql .= " ORDER BY i.updated_at DESC, i.id DESC";
         
         return $this->query($sql, $params);
+    }
+
+    public function getAllPaged($limit, $offset)
+    {
+        $sql = "SELECT i.*, p.code as product_code, p.name as product_name, 
+                       p.unit, p.min_stock, p.max_stock,
+                       w.name as warehouse_name, w.code as warehouse_code
+                FROM {$this->table} i
+                INNER JOIN products p ON i.product_id = p.id
+                INNER JOIN warehouses w ON i.warehouse_id = w.id
+                ORDER BY i.updated_at DESC, i.id DESC
+                LIMIT ? OFFSET ?";
+        return $this->query($sql, [$limit, $offset]);
+    }
+
+    public function searchPaged($warehouseId, $keyword, $limit, $offset)
+    {
+        $sql = "SELECT i.*, p.code as product_code, p.name as product_name, 
+                       p.unit, p.min_stock, p.max_stock,
+                       w.name as warehouse_name, w.code as warehouse_code
+                FROM {$this->table} i
+                INNER JOIN products p ON i.product_id = p.id
+                INNER JOIN warehouses w ON i.warehouse_id = w.id
+                WHERE 1=1";
+        $params = [];
+
+        if ($warehouseId) {
+            $sql .= " AND i.warehouse_id = ?";
+            $params[] = $warehouseId;
+        }
+
+        if ($keyword) {
+            $sql .= " AND (p.code LIKE ? OR p.name LIKE ?)";
+            $params[] = "%{$keyword}%";
+            $params[] = "%{$keyword}%";
+        }
+
+        $sql .= " ORDER BY i.updated_at DESC, i.id DESC LIMIT ? OFFSET ?";
+        $params[] = $limit;
+        $params[] = $offset;
+
+        return $this->query($sql, $params);
+    }
+
+    public function countAll()
+    {
+        $sql = "SELECT COUNT(*) as total FROM {$this->table}";
+        $result = $this->query($sql);
+        return $result ? (int)$result[0]['total'] : 0;
+    }
+
+    public function countSearch($warehouseId, $keyword)
+    {
+        $sql = "SELECT COUNT(*) as total
+                FROM {$this->table} i
+                INNER JOIN products p ON i.product_id = p.id
+                WHERE 1=1";
+        $params = [];
+
+        if ($warehouseId) {
+            $sql .= " AND i.warehouse_id = ?";
+            $params[] = $warehouseId;
+        }
+
+        if ($keyword) {
+            $sql .= " AND (p.code LIKE ? OR p.name LIKE ?)";
+            $params[] = "%{$keyword}%";
+            $params[] = "%{$keyword}%";
+        }
+
+        $result = $this->query($sql, $params);
+        return $result ? (int)$result[0]['total'] : 0;
     }
 
     /**

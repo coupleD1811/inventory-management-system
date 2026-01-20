@@ -180,6 +180,10 @@ class Auth
             return true;
         }
 
+        if (self::hasRole('manager')) {
+            return true;
+        }
+
         // If user has no warehouse assigned, deny access
         if (empty($user['warehouse_id'])) {
             return false;

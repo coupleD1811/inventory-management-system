@@ -24,18 +24,16 @@ class InventoryController extends Controller
         // If user has assigned warehouse, force filter to that warehouse
         $warehouseId = $userWarehouseId ?? ($_GET['warehouse_id'] ?? '');
         $search = $_GET['search'] ?? '';
+        $page = max(1, (int)($_GET['page'] ?? 1));
+        $perPage = 15;
+        $offset = ($page - 1) * $perPage;
         
         if ($warehouseId || $search) {
-            $inventory = $this->inventoryModel->search($warehouseId, $search);
+            $inventory = $this->inventoryModel->searchPaged($warehouseId, $search, $perPage, $offset);
+            $total = $this->inventoryModel->countSearch($warehouseId, $search);
         } else {
-            $inventory = $this->inventoryModel->getAllWithDetails();
-            
-            // Filter by warehouse if user is not admin
-            if ($userWarehouseId) {
-                $inventory = array_filter($inventory, function($item) use ($userWarehouseId) {
-                    return $item['warehouse_id'] == $userWarehouseId;
-                });
-            }
+            $inventory = $this->inventoryModel->getAllPaged($perPage, $offset);
+            $total = $this->inventoryModel->countAll();
         }
 
         // Get warehouses - admin sees all, others see only their warehouse
@@ -51,7 +49,10 @@ class InventoryController extends Controller
             'warehouses' => $warehouses,
             'warehouseId' => $warehouseId,
             'search' => $search,
-            'isWarehouseManager' => $userWarehouseId !== null
+            'isWarehouseManager' => $userWarehouseId !== null,
+            'page' => $page,
+            'perPage' => $perPage,
+            'total' => $total
         ];
 
         $this->view('inventory/index', $data);

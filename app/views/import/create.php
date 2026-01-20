@@ -17,10 +17,10 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label required">Kho nhập</label>
-                                <select name="warehouse_id" class="form-select" required>
+                                <select name="warehouse_id" id="warehouseSelect" class="form-select" required>
                                     <option value="">-- Chọn kho --</option>
                                     <?php foreach ($warehouses as $wh): ?>
-                                        <option value="<?= $wh['id'] ?>" <?= ($old['warehouse_id'] ?? '') == $wh['id'] ? 'selected' : '' ?>>
+                                        <option value="<?= $wh['id'] ?>" data-code="<?= htmlspecialchars($wh['code']) ?>" <?= ($old['warehouse_id'] ?? '') == $wh['id'] ? 'selected' : '' ?>>
                                             <?= htmlspecialchars($wh['name']) ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -29,9 +29,9 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">Nhà cung cấp</label>
-                                <select name="supplier_id" class="form-select">
-                                    <option value="">-- Chọn nhà cung cấp --</option>
+                                <label class="form-label" id="supplierLabel">Nhà cung cấp</label>
+                                <select name="supplier_id" id="supplierSelect" class="form-select">
+                                    <option value="" id="supplierPlaceholder">-- Chọn nhà cung cấp --</option>
                                     <?php foreach ($suppliers as $sup): ?>
                                         <option value="<?= $sup['id'] ?>" <?= ($old['supplier_id'] ?? '') == $sup['id'] ? 'selected' : '' ?>>
                                             <?= htmlspecialchars($sup['name']) ?>
@@ -76,5 +76,23 @@
         </div>
     </div>
 </div>
+
+<script>
+    (function () {
+        const warehouseSelect = document.getElementById('warehouseSelect');
+        const supplierLabel = document.getElementById('supplierLabel');
+        const supplierPlaceholder = document.getElementById('supplierPlaceholder');
+
+        function syncSupplierLabel() {
+            const selected = warehouseSelect.options[warehouseSelect.selectedIndex];
+            const isFinished = selected && selected.dataset.code === 'KHO-TP';
+            supplierLabel.textContent = isFinished ? 'Phân xưởng' : 'Nhà cung cấp';
+            supplierPlaceholder.textContent = isFinished ? '-- Chọn phân xưởng --' : '-- Chọn nhà cung cấp --';
+        }
+
+        warehouseSelect.addEventListener('change', syncSupplierLabel);
+        syncSupplierLabel();
+    })();
+</script>
 
 <?php require_once '../app/views/layouts/footer.php'; ?>

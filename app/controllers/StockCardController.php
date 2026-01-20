@@ -40,7 +40,11 @@ class StockCardController extends Controller
         }
 
         $warehouses = $this->warehouseModel->getAllActive();
-        $products = $this->productModel->getAllActive();
+        if ($warehouseId) {
+            $products = $this->productModel->getByWarehouse($warehouseId);
+        } else {
+            $products = $this->productModel->getAllActive();
+        }
 
         $this->view('stockcard/index', [
             'title' => 'Thẻ kho',
