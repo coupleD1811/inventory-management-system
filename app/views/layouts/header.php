@@ -200,7 +200,7 @@
                         <?php endif; ?>
 
 
-                        <?php if (Auth::hasPermission('stock_card.view')): ?>
+                        <?php if (Auth::isStorekeeper() && Auth::hasPermission('stock_card.view')): ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="<?= BASE_URL ?>stock_card">
                                     <span class="nav-link-icon d-lg-inline-block">
@@ -211,7 +211,7 @@
                             </li>
                         <?php endif; ?>
 
-                        <?php if (!Auth::isStorekeeper() && (Auth::hasPermission('report.view') || Auth::hasPermission('inventory.report') || Auth::hasPermission('report.profit_loss'))): ?>
+                        <?php if (!Auth::isStorekeeper() && (Auth::hasPermission('report.view') || Auth::hasPermission('inventory.report') || Auth::hasPermission('report.profit_loss') || Auth::hasPermission('stock_card.view'))): ?>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#navbar-reports" data-bs-toggle="dropdown" role="button">
                                     <span class="nav-link-icon d-lg-inline-block">
@@ -236,6 +236,11 @@
                                     <?php if (Auth::hasPermission('report.profit_loss')): ?>
                                         <a class="dropdown-item" href="<?= BASE_URL ?>report/profitLoss">
                                             <i class="ti ti-chart-line me-2"></i>Báo cáo Lời/Lỗ
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (Auth::hasPermission('stock_card.view')): ?>
+                                        <a class="dropdown-item" href="<?= BASE_URL ?>stock_card">
+                                            <i class="ti ti-file-text me-2"></i>Thẻ kho
                                         </a>
                                     <?php endif; ?>
                                     <!-- BÁO CÁO GIAO DỊCH ĐÃ BỊ TẮT
