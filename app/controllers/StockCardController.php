@@ -5,6 +5,7 @@ class StockCardController extends Controller
     private $transactionModel;
     private $warehouseModel;
     private $productModel;
+    private $inventoryModel;
 
     public function __construct()
     {
@@ -12,13 +13,15 @@ class StockCardController extends Controller
         $this->transactionModel = $this->model('Transaction');
         $this->warehouseModel = $this->model('Warehouse');
         $this->productModel = $this->model('Product');
+        $this->inventoryModel = $this->model('Inventory');
     }
 
     public function index()
     {
         Auth::requirePermission('stock_card.view');
 
-        $warehouseId = $_GET['warehouse_id'] ?? null;
+        $isStorekeeper = Auth::isStorekeeper();
+        $warehouseId = $isStorekeeper ? Auth::getWarehouseId() : ($_GET['warehouse_id'] ?? null);
         $productId = $_GET['product_id'] ?? null;
         $startDate = $_GET['start_date'] ?? null;
         $endDate = $_GET['end_date'] ?? null;
@@ -26,24 +29,39 @@ class StockCardController extends Controller
         $transactions = [];
         $product = null;
         $warehouse = null;
+        $stockCards = [];
 
-        if ($warehouseId && $productId) {
-            $transactions = $this->transactionModel->getStockCard(
-                $warehouseId,
-                $productId,
-                $startDate,
-                $endDate
-            );
-
-            $product = $this->productModel->find($productId);
+        if ($isStorekeeper) {
             $warehouse = $this->warehouseModel->find($warehouseId);
+            $products = $this->productModel->getByWarehouse($warehouseId);
+            foreach ($products as $prod) {
+                $stockCards[] = [
+                    'product' => $prod,
+                    'transactions' => $this->transactionModel->getStockCard($warehouseId, $prod['id'])
+                ];
+            }
+        } else {
+            if ($warehouseId && $productId) {
+                $transactions = $this->transactionModel->getStockCard(
+                    $warehouseId,
+                    $productId,
+                    $startDate,
+                    $endDate
+                );
+
+                $product = $this->productModel->find($productId);
+                $warehouse = $this->warehouseModel->find($warehouseId);
+            }
         }
 
         $warehouses = $this->warehouseModel->getAllActive();
+        $warehouseWarnings = $this->inventoryModel->getWarehouseWarnings();
         if ($warehouseId) {
-            $products = $this->productModel->getByWarehouse($warehouseId);
+            $products = $products ?? $this->productModel->getByWarehouse($warehouseId);
+            $productWarnings = $this->inventoryModel->getProductWarnings($warehouseId);
         } else {
-            $products = $this->productModel->getAllActive();
+            $products = $products ?? $this->productModel->getAllActive();
+            $productWarnings = [];
         }
 
         $this->view('stockcard/index', [
@@ -56,7 +74,11 @@ class StockCardController extends Controller
             'warehouseId' => $warehouseId,
             'productId' => $productId,
             'startDate' => $startDate,
-            'endDate' => $endDate
+            'endDate' => $endDate,
+            'warehouseWarnings' => $warehouseWarnings,
+            'productWarnings' => $productWarnings,
+            'isStorekeeper' => $isStorekeeper,
+            'stockCards' => $stockCards
         ]);
     }
 }

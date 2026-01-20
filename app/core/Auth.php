@@ -91,6 +91,16 @@ class Auth
         return self::hasRole('admin');
     }
 
+    public static function isStorekeeper()
+    {
+        return self::hasRole([
+            'storekeeper_fuel',
+            'storekeeper_raw',
+            'storekeeper_spare',
+            'storekeeper_finished'
+        ]);
+    }
+
     public static function login($userId)
     {
         $_SESSION['user_id'] = $userId;

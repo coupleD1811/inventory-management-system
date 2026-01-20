@@ -128,7 +128,14 @@
                                     <tr>
                                         <td><?= $index + 1 ?></td>
                                         <td><?= htmlspecialchars($detail['product_code']) ?></td>
-                                        <td><?= htmlspecialchars($detail['product_name']) ?></td>
+                                    <td>
+                                        <?= htmlspecialchars($detail['product_name']) ?>
+                                        <?php if (($detailWarnings[$detail['id']] ?? null) === 'near'): ?>
+                                            <i class="ti ti-alert-triangle text-warning ms-1" title="Gần vượt mức tồn kho"></i>
+                                        <?php elseif (($detailWarnings[$detail['id']] ?? null) === 'over'): ?>
+                                            <i class="ti ti-alert-triangle text-danger ms-1" title="Vượt mức tồn kho"></i>
+                                        <?php endif; ?>
+                                    </td>
                                         <td><?= htmlspecialchars($detail['unit']) ?></td>
                                         <td class="text-end"><?= number_format($detail['quantity'], 2) ?></td>
                                         <td class="text-end"><?= number_format($detail['cost_price'] ?? 0) ?> đ</td>

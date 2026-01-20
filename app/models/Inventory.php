@@ -3,6 +3,7 @@
 class Inventory extends Model
 {
     protected $table = 'inventory';
+    private $warningThreshold = 0.1;
 
     public function getByWarehouse($warehouseId)
     {
@@ -204,5 +205,98 @@ class Inventory extends Model
         }
         
         return $newPrice; // Nếu chưa có tồn kho, giá TB = giá nhập đầu tiên
+    }
+
+    public function getQuantity($warehouseId, $productId)
+    {
+        $sql = "SELECT quantity FROM {$this->table} WHERE warehouse_id = ? AND product_id = ?";
+        $result = $this->query($sql, [$warehouseId, $productId]);
+        return $result ? (float)$result[0]['quantity'] : 0;
+    }
+
+    public function getWarningStatusForQuantity($quantity, $minStock, $maxStock)
+    {
+        $minStock = (float)$minStock;
+        $maxStock = (float)$maxStock;
+
+        if ($minStock > 0 && $quantity <= $minStock) {
+            return 'over';
+        }
+        if ($maxStock > 0 && $quantity >= $maxStock) {
+            return 'over';
+        }
+
+        if ($minStock > 0 && $quantity <= ($minStock * (1 + $this->warningThreshold))) {
+            return 'near';
+        }
+        if ($maxStock > 0 && $quantity >= ($maxStock * (1 - $this->warningThreshold))) {
+            return 'near';
+        }
+
+        return null;
+    }
+
+    public function getProductWarnings($warehouseId = null)
+    {
+        $sql = "SELECT i.warehouse_id, i.product_id, i.quantity, p.min_stock, p.max_stock
+                FROM {$this->table} i
+                INNER JOIN products p ON i.product_id = p.id
+                WHERE p.status = 'active'";
+        $params = [];
+        if ($warehouseId) {
+            $sql .= " AND i.warehouse_id = ?";
+            $params[] = $warehouseId;
+        }
+
+        $rows = $this->query($sql, $params);
+        $warnings = [];
+        foreach ($rows as $row) {
+            $status = $this->getWarningStatusForQuantity(
+                (float)$row['quantity'],
+                $row['min_stock'],
+                $row['max_stock']
+            );
+            if ($status) {
+                $warnings[(int)$row['product_id']] = $status;
+            }
+        }
+
+        return $warnings;
+    }
+
+    public function getWarehouseWarnings()
+    {
+        $sql = "SELECT i.warehouse_id, i.quantity, p.min_stock, p.max_stock
+                FROM {$this->table} i
+                INNER JOIN products p ON i.product_id = p.id
+                WHERE p.status = 'active'";
+        $rows = $this->query($sql);
+        $warnings = [];
+        foreach ($rows as $row) {
+            $warehouseId = (int)$row['warehouse_id'];
+            $status = $this->getWarningStatusForQuantity(
+                (float)$row['quantity'],
+                $row['min_stock'],
+                $row['max_stock']
+            );
+            if ($status === 'over') {
+                $warnings[$warehouseId] = 'over';
+            } elseif ($status === 'near' && ($warnings[$warehouseId] ?? '') !== 'over') {
+                $warnings[$warehouseId] = 'near';
+            }
+        }
+        return $warnings;
+    }
+
+    public function getWarningSummary($warehouseId = null)
+    {
+        $warnings = $this->getProductWarnings($warehouseId);
+        if (in_array('over', $warnings, true)) {
+            return 'over';
+        }
+        if (in_array('near', $warnings, true)) {
+            return 'near';
+        }
+        return null;
     }
 }
