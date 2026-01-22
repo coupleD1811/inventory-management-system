@@ -240,7 +240,7 @@
                                     <?php endif; ?>
                                     <?php if (Auth::hasPermission('stock_card.view')): ?>
                                         <a class="dropdown-item" href="<?= BASE_URL ?>stock_card">
-                                            <i class="ti ti-file-text me-2"></i>Thẻ kho
+                                            <i class="ti ti-file-text me-2"></i>Thẻ kho <?= $warningIcon ?>
                                         </a>
                                     <?php endif; ?>
                                     <!-- BÁO CÁO GIAO DỊCH ĐÃ BỊ TẮT
