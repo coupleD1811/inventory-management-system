@@ -9,7 +9,14 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Thẻ kho - Lịch sử giao dịch</h3>
+                <h3 class="card-title">
+                    Thẻ kho - Lịch sử giao dịch
+                    <?php if (($warningSummary ?? null) === 'over'): ?>
+                        <i class="ti ti-alert-triangle text-danger ms-1" title="Vượt mức tồn kho"></i>
+                    <?php elseif (($warningSummary ?? null) === 'near'): ?>
+                        <i class="ti ti-alert-triangle text-warning ms-1" title="Gần vượt mức tồn kho"></i>
+                    <?php endif; ?>
+                </h3>
             </div>
             <div class="card-body">
                 <?php if ($isStorekeeper): ?>

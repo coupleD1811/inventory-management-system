@@ -56,6 +56,7 @@ class StockCardController extends Controller
 
         $warehouses = $this->warehouseModel->getAllActive();
         $warehouseWarnings = $this->inventoryModel->getWarehouseWarnings();
+        $warningSummary = $this->inventoryModel->getWarningSummary($isStorekeeper ? $warehouseId : null);
         if ($warehouseId) {
             $products = $products ?? $this->productModel->getByWarehouse($warehouseId);
             $productWarnings = $this->inventoryModel->getProductWarnings($warehouseId);
@@ -77,6 +78,7 @@ class StockCardController extends Controller
             'endDate' => $endDate,
             'warehouseWarnings' => $warehouseWarnings,
             'productWarnings' => $productWarnings,
+            'warningSummary' => $warningSummary,
             'isStorekeeper' => $isStorekeeper,
             'stockCards' => $stockCards
         ]);
