@@ -44,8 +44,6 @@
                                 <select name="export_type" class="form-select">
                                     <option value="sale" <?= ($old['export_type'] ?? 'sale') === 'sale' ? 'selected' : '' ?>>Bán hàng</option>
                                     <option value="internal" <?= ($old['export_type'] ?? '') === 'internal' ? 'selected' : '' ?>>Nội bộ</option>
-                                    <option value="damaged" <?= ($old['export_type'] ?? '') === 'damaged' ? 'selected' : '' ?>>Hư hỏng</option>
-                                    <option value="other" <?= ($old['export_type'] ?? '') === 'other' ? 'selected' : '' ?>>Khác</option>
                                 </select>
                             </div>
                         </div>
