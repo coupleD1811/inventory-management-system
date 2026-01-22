@@ -63,6 +63,12 @@
                                     <?php endif; ?>
                                 </td>
                             </tr>
+                            <?php if ($export['status'] === 'cancelled' && !empty($export['reject_reason'])): ?>
+                                <tr>
+                                    <td><strong>Lý do từ chối:</strong></td>
+                                    <td><?= nl2br(htmlspecialchars($export['reject_reason'])) ?></td>
+                                </tr>
+                            <?php endif; ?>
                             <tr>
                                 <td><strong>Tổng tiền:</strong></td>
                                 <td><strong class="text-primary"><?= number_format($export['total_amount']) ?> đ</strong></td>
@@ -173,14 +179,34 @@
                            onclick="return confirm('Bạn có chắc chắn muốn duyệt phiếu xuất này? Tồn kho sẽ được cập nhật tự động.')">
                             <i class="ti ti-check me-2"></i>Duyệt phiếu xuất
                         </a>
-                        <a href="<?= BASE_URL ?>export/reject/<?= $export['id'] ?>" 
-                           class="btn btn-outline-danger"
-                           onclick="return confirm('Bạn có chắc chắn muốn từ chối phiếu xuất này?')">
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#rejectExportModal">
                             <i class="ti ti-x me-2"></i>Từ chối
-                        </a>
+                        </button>
                     </div>
                 <?php endif; ?>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Export Modal -->
+<div class="modal modal-blur fade" id="rejectExportModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="<?= BASE_URL ?>export/reject/<?= $export['id'] ?>">
+                <div class="modal-header">
+                    <h5 class="modal-title">Lý do từ chối phiếu xuất</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label required">Lý do từ chối</label>
+                    <textarea name="reject_reason" class="form-control" rows="4" required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xác nhận từ chối</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
