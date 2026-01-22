@@ -82,6 +82,7 @@ CREATE TABLE `exports` (
   `created_by` int DEFAULT NULL,
   `approved_by` int DEFAULT NULL,
   `approved_at` datetime DEFAULT NULL,
+  `reject_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -125,6 +126,7 @@ CREATE TABLE `imports` (
   `created_by` int DEFAULT NULL,
   `approved_by` int DEFAULT NULL,
   `approved_at` datetime DEFAULT NULL,
+  `reject_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

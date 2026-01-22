@@ -441,10 +441,24 @@ class ExportController extends Controller
             return;
         }
 
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $_SESSION['error'] = 'Vui lòng nhập lý do từ chối!';
+            $this->redirect('export/detail/' . $id);
+            return;
+        }
+
+        $rejectReason = trim($_POST['reject_reason'] ?? '');
+        if ($rejectReason === '') {
+            $_SESSION['error'] = 'Vui lòng nhập lý do từ chối!';
+            $this->redirect('export/detail/' . $id);
+            return;
+        }
+
         if ($this->exportModel->update($id, [
             'status' => 'cancelled',
             'approved_by' => Auth::id(),
-            'approved_at' => date('Y-m-d H:i:s')
+            'approved_at' => date('Y-m-d H:i:s'),
+            'reject_reason' => $rejectReason
         ])) {
             $_SESSION['success'] = 'Đã từ chối phiếu xuất!';
         } else {
