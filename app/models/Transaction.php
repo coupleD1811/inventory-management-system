@@ -10,7 +10,23 @@ class Transaction extends Model
     public function getStockCard($warehouseId, $productId, $startDate = null, $endDate = null)
     {
         $sql = "SELECT t.*, w.name as warehouse_name, p.name as product_name, p.code as product_code,
-                       pt.name as product_type_name,
+                       CASE
+                           WHEN t.reference_type = 'import' THEN (
+                               SELECT pt.name
+                               FROM import_details id
+                               LEFT JOIN product_types pt ON id.product_type_id = pt.id
+                               WHERE id.import_id = t.reference_id AND id.product_id = t.product_id
+                               LIMIT 1
+                           )
+                           WHEN t.reference_type = 'export' THEN (
+                               SELECT pt.name
+                               FROM export_details ed
+                               LEFT JOIN product_types pt ON ed.product_type_id = pt.id
+                               WHERE ed.export_id = t.reference_id AND ed.product_id = t.product_id
+                               LIMIT 1
+                           )
+                           ELSE NULL
+                       END as product_type_name,
                        u.full_name as created_by_name,
                        CASE 
                            WHEN t.reference_type = 'import' THEN (
@@ -30,7 +46,6 @@ class Transaction extends Model
                 FROM {$this->table} t
                 INNER JOIN warehouses w ON t.warehouse_id = w.id
                 INNER JOIN products p ON t.product_id = p.id
-                LEFT JOIN product_types pt ON p.product_type_id = pt.id
                 LEFT JOIN users u ON t.created_by = u.id
                 WHERE t.warehouse_id = ? AND t.product_id = ?";
         

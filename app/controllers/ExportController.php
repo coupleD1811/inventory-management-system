@@ -152,10 +152,12 @@ class ExportController extends Controller
 
         $exportDetailModel = $this->model('ExportDetail');
         $productModel = $this->model('Product');
+        $productTypeModel = $this->model('ProductType');
         $inventoryModel = $this->model('Inventory');
         
         $details = $exportDetailModel->getByExport($id);
         $products = $productModel->getByWarehouse($export['warehouse_id']);
+        $productTypes = $productTypeModel->getAllActive();
         $detailWarnings = [];
         if (!empty($details)) {
             $productTotals = [];
@@ -178,6 +180,7 @@ class ExportController extends Controller
             'export' => $export,
             'details' => $details,
             'products' => $products,
+            'productTypes' => $productTypes,
             'detailWarnings' => $detailWarnings
         ]);
     }
@@ -243,10 +246,11 @@ class ExportController extends Controller
             // Xử lý từng sản phẩm (MỚI)
             foreach ($products as $product) {
                 $productId = $product['product_id'] ?? null;
+                $productTypeId = $product['product_type_id'] ?? null;
                 $quantity = $product['quantity'] ?? 0;
                 $unitPrice = $product['unit_price'] ?? 0;
                 
-                if ($productId && $quantity > 0 && $unitPrice >= 0) {
+                if ($productId && $productTypeId && $quantity > 0 && $unitPrice >= 0) {
                     if (!$productModel->belongsToWarehouse($productId, $export['warehouse_id'])) {
                         continue;
                     }
@@ -264,6 +268,7 @@ class ExportController extends Controller
                     $data = [
                         'export_id' => $id,
                         'product_id' => $productId,
+                        'product_type_id' => $productTypeId,
                         'quantity' => $quantity,
                         'unit_price' => $unitPrice,
                         'cost_price' => $costPrice,

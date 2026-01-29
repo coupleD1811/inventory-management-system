@@ -49,7 +49,7 @@ class StockCardController extends Controller
                     $endDate
                 );
 
-                $product = $this->productModel->findWithType($productId);
+                $product = $this->productModel->find($productId);
                 $warehouse = $this->warehouseModel->find($warehouseId);
             }
         }
@@ -60,9 +60,11 @@ class StockCardController extends Controller
         if ($warehouseId) {
             $products = $products ?? $this->productModel->getByWarehouse($warehouseId);
             $productWarnings = $this->inventoryModel->getProductWarnings($warehouseId);
+            $productWarningDetails = $this->inventoryModel->getProductWarningDetails($warehouseId);
         } else {
             $products = $products ?? $this->productModel->getAllActive();
             $productWarnings = [];
+            $productWarningDetails = [];
         }
 
         $this->view('stockcard/index', [
@@ -78,6 +80,7 @@ class StockCardController extends Controller
             'endDate' => $endDate,
             'warehouseWarnings' => $warehouseWarnings,
             'productWarnings' => $productWarnings,
+            'productWarningDetails' => $productWarningDetails,
             'warningSummary' => $warningSummary,
             'isStorekeeper' => $isStorekeeper,
             'stockCards' => $stockCards

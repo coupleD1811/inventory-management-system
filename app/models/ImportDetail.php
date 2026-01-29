@@ -10,7 +10,7 @@ class ImportDetail extends Model
                        p.min_stock, p.max_stock, pt.name as product_type_name
                 FROM {$this->table} id
                 INNER JOIN products p ON id.product_id = p.id
-                LEFT JOIN product_types pt ON p.product_type_id = pt.id
+                LEFT JOIN product_types pt ON id.product_type_id = pt.id
                 WHERE id.import_id = ?
                 ORDER BY id.id";
         return $this->query($sql, [$importId]);

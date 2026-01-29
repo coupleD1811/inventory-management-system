@@ -201,25 +201,33 @@
                     <div id="product-rows">
                         <div class="product-row mb-3 p-3 border rounded">
                             <div class="row">
-                                <div class="col-md-5">
+                                <div class="col-md-4">
                                     <label class="form-label required">Sản phẩm</label>
                                     <select name="products[0][product_id]" class="form-select" required>
                                         <option value="">-- Chọn sản phẩm --</option>
                                         <?php foreach ($products as $product): ?>
                                             <option value="<?= $product['id'] ?>">
                                                 <?= htmlspecialchars($product['code']) ?> - <?= htmlspecialchars($product['name']) ?>
-                                                <?php if (!empty($product['product_type_name'])): ?>
-                                                    - <?= htmlspecialchars($product['product_type_name']) ?>
-                                                <?php endif; ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
+                                    <label class="form-label required">Loại mặt hàng</label>
+                                    <select name="products[0][product_type_id]" class="form-select" required>
+                                        <option value="">-- Chọn loại --</option>
+                                        <?php foreach ($productTypes as $type): ?>
+                                            <option value="<?= $type['id'] ?>">
+                                                <?= htmlspecialchars($type['name']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
                                     <label class="form-label required">Số lượng</label>
                                     <input type="number" name="products[0][quantity]" class="form-control" step="0.01" min="0.01" required>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label class="form-label required">Đơn giá</label>
                                     <input type="number" name="products[0][unit_price]" class="form-control" step="0.01" min="0" required>
                                 </div>

@@ -10,7 +10,7 @@ class ExportDetail extends Model
                        p.min_stock, p.max_stock, pt.name as product_type_name
                 FROM {$this->table} ed
                 INNER JOIN products p ON ed.product_id = p.id
-                LEFT JOIN product_types pt ON p.product_type_id = pt.id
+                LEFT JOIN product_types pt ON ed.product_type_id = pt.id
                 WHERE ed.export_id = ?
                 ORDER BY ed.id";
         return $this->query($sql, [$exportId]);
