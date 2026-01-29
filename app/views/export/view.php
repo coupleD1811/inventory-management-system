@@ -229,7 +229,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <label class="form-label required">Sản phẩm</label>
-                                    <select name="products[0][product_id]" class="form-select" required>
+                                    <select name="products[0][product_id]" class="form-select product-select" required>
                                         <option value="">-- Chọn sản phẩm --</option>
                                         <?php foreach ($products as $product): ?>
                                             <option value="<?= $product['id'] ?>">
@@ -240,10 +240,10 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label required">Loại mặt hàng</label>
-                                    <select name="products[0][product_type_id]" class="form-select" required>
+                                    <select name="products[0][product_type_id]" class="form-select product-type-select" required>
                                         <option value="">-- Chọn loại --</option>
                                         <?php foreach ($productTypes as $type): ?>
-                                            <option value="<?= $type['id'] ?>">
+                                            <option value="<?= $type['id'] ?>" data-product-id="<?= htmlspecialchars($type['product_id'] ?? '') ?>">
                                                 <?= htmlspecialchars($type['name']) ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -281,6 +281,25 @@
 <script>
 let productRowIndex = 1;
 
+function filterTypeOptions(row) {
+    const productSelect = row.querySelector('.product-select');
+    const typeSelect = row.querySelector('.product-type-select');
+    if (!productSelect || !typeSelect) {
+        return;
+    }
+    const productId = productSelect.value;
+    Array.from(typeSelect.options).forEach(option => {
+        if (!option.value) {
+            option.hidden = false;
+            option.disabled = false;
+            return;
+        }
+        const match = option.dataset.productId === productId;
+        option.hidden = !match;
+        option.disabled = !match;
+    });
+}
+
 document.getElementById('add-more-products').addEventListener('click', function() {
     const container = document.getElementById('product-rows');
     const firstRow = document.querySelector('.product-row');
@@ -303,6 +322,7 @@ document.getElementById('add-more-products').addEventListener('click', function(
     container.appendChild(newRow);
     productRowIndex++;
     
+    filterTypeOptions(newRow);
     updateRemoveButtons();
 });
 
@@ -320,6 +340,20 @@ function updateRemoveButtons() {
         btn.disabled = rows.length === 1;
     });
 }
+
+document.getElementById('product-rows').addEventListener('change', function(e) {
+    if (!e.target.classList.contains('product-select')) {
+        return;
+    }
+    const row = e.target.closest('.product-row');
+    const typeSelect = row.querySelector('.product-type-select');
+    if (typeSelect) {
+        typeSelect.value = '';
+    }
+    filterTypeOptions(row);
+});
+
+document.querySelectorAll('.product-row').forEach(filterTypeOptions);
 </script>
 
 <?php require_once '../app/views/layouts/footer.php'; ?>
