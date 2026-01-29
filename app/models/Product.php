@@ -6,9 +6,10 @@ class Product extends Model
 
     public function getAllWithWarehouse($warehouseId = null)
     {
-        $sql = "SELECT p.*, w.name as warehouse_name
+        $sql = "SELECT p.*, w.name as warehouse_name, pt.name as product_type_name
                 FROM {$this->table} p
-                LEFT JOIN warehouses w ON p.warehouse_id = w.id";
+                LEFT JOIN warehouses w ON p.warehouse_id = w.id
+                LEFT JOIN product_types pt ON p.product_type_id = pt.id";
         $params = [];
 
         if ($warehouseId) {
@@ -22,29 +23,37 @@ class Product extends Model
 
     public function getAllActive($warehouseId = null)
     {
-        $sql = "SELECT * FROM {$this->table} WHERE status = 'active'";
+        $sql = "SELECT p.*, pt.name as product_type_name
+                FROM {$this->table} p
+                LEFT JOIN product_types pt ON p.product_type_id = pt.id
+                WHERE p.status = 'active'";
         $params = [];
 
         if ($warehouseId) {
-            $sql .= " AND warehouse_id = ?";
+            $sql .= " AND p.warehouse_id = ?";
             $params[] = $warehouseId;
         }
 
-        $sql .= " ORDER BY name";
+        $sql .= " ORDER BY p.name";
         return $this->query($sql, $params);
     }
 
     public function getByWarehouse($warehouseId)
     {
-        $sql = "SELECT * FROM {$this->table} WHERE warehouse_id = ? AND status = 'active' ORDER BY name";
+        $sql = "SELECT p.*, pt.name as product_type_name
+                FROM {$this->table} p
+                LEFT JOIN product_types pt ON p.product_type_id = pt.id
+                WHERE p.warehouse_id = ? AND p.status = 'active'
+                ORDER BY p.name";
         return $this->query($sql, [$warehouseId]);
     }
 
     public function search($keyword, $warehouseId = null)
     {
-        $sql = "SELECT p.*, w.name as warehouse_name
+        $sql = "SELECT p.*, w.name as warehouse_name, pt.name as product_type_name
                 FROM {$this->table} p
                 LEFT JOIN warehouses w ON p.warehouse_id = w.id
+                LEFT JOIN product_types pt ON p.product_type_id = pt.id
                 WHERE (p.code LIKE ? OR p.name LIKE ?)";
         
         $params = ["%{$keyword}%", "%{$keyword}%"];
@@ -56,6 +65,16 @@ class Product extends Model
         
         $sql .= " ORDER BY p.id DESC";
         return $this->query($sql, $params);
+    }
+
+    public function findWithType($id)
+    {
+        $sql = "SELECT p.*, pt.name as product_type_name
+                FROM {$this->table} p
+                LEFT JOIN product_types pt ON p.product_type_id = pt.id
+                WHERE p.id = ?";
+        $result = $this->query($sql, [$id]);
+        return $result ? $result[0] : null;
     }
 
     public function findByCode($code)

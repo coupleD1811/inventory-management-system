@@ -292,6 +292,21 @@ INSERT INTO `permissions` (`id`, `name`, `display_name`, `module`, `description`
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `product_types`
+--
+
+CREATE TABLE `product_types` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `products`
 --
 
@@ -299,6 +314,7 @@ CREATE TABLE `products` (
   `id` int NOT NULL,
   `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `product_type_id` int DEFAULT NULL,
   `warehouse_id` int NOT NULL,
   `unit` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'cái' COMMENT 'Đơn vị tính',
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
@@ -314,25 +330,25 @@ CREATE TABLE `products` (
 -- Đang đổ dữ liệu cho bảng `products`
 --
 
-INSERT INTO `products` (`id`, `code`, `name`, `warehouse_id`, `unit`, `description`, `image`, `min_stock`, `max_stock`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'SP001', 'Laptop Dell Inspiron 15', 7, 'cái', 'Laptop Dell Inspiron 15 3000 Series', NULL, 10, 100, 'active', '2026-01-12 03:04:33', '2026-01-12 03:04:33'),
-(2, 'SP002', 'Chuột Logitech M185', 7, 'cái', 'Chuột không dây Logitech M185', NULL, 20, 200, 'active', '2026-01-12 03:04:33', '2026-01-12 03:04:33'),
-(3, 'SP003', 'Bàn phím Logitech K120', 7, 'cái', 'Bàn phím có dây Logitech K120', NULL, 15, 150, 'active', '2026-01-12 03:04:33', '2026-01-12 03:04:33'),
-(4, 'SP004', 'Bút bi Thiên Long TL-027', 7, 'cây', 'Bút bi Thiên Long TL-027', NULL, 100, 1000, 'active', '2026-01-12 03:04:33', '2026-01-12 03:04:33'),
-(5, 'SP005', 'Giấy A4 Double A', 7, 'ream', 'Giấy A4 Double A 70gsm', NULL, 50, 500, 'active', '2026-01-12 03:04:33', '2026-01-12 03:04:33'),
-(6, 'SP006', 'Mì gói Hảo Hảo', 7, 'thùng', 'Mì gói Hảo Hảo 30 gói/thùng', NULL, 20, 200, 'active', '2026-01-12 03:04:33', '2026-01-12 03:04:33'),
-(7, 'NL-001', 'Đường trắng', 4, 'kg', 'Đường tinh luyện trắng', NULL, 100, 1000, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
-(8, 'NL-002', 'Bột mì', 4, 'kg', 'Bột mì đa dụng', NULL, 200, 2000, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
-(9, 'NL-003', 'Hương liệu vani', 4, 'lít', 'Hương liệu tổng hợp', NULL, 10, 100, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
-(10, 'NL-004', 'Bao bì carton', 4, 'cái', 'Hộp carton đựng sản phẩm', NULL, 500, 5000, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
-(11, 'NNL-001', 'Than đá', 5, 'tấn', 'Than đá công nghiệp', NULL, 5, 50, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
-(12, 'NNL-002', 'Dầu diesel', 5, 'lít', 'Dầu diesel cho máy phát điện', NULL, 100, 1000, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
-(13, 'PT-001', 'Băng tải', 6, 'mét', 'Băng tải cao su', NULL, 10, 100, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
-(14, 'PT-002', 'Motor điện 3HP', 6, 'cái', 'Motor điện công suất 3HP', NULL, 2, 20, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
-(15, 'PT-003', 'Vòng bi SKF', 6, 'cái', 'Vòng bi chất lượng cao', NULL, 20, 200, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
-(16, 'TP-001', 'Bánh quy bơ', 7, 'hộp', 'Bánh quy bơ hộp 200g', NULL, 100, 1000, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
-(17, 'TP-002', 'Kẹo sữa', 7, 'hộp', 'Kẹo sữa hộp 500g', NULL, 200, 2000, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
-(18, 'TP-003', 'Bánh chocolate', 7, 'hộp', 'Bánh chocolate hộp 300g', NULL, 150, 1500, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36');
+INSERT INTO `products` (`id`, `code`, `name`, `product_type_id`, `warehouse_id`, `unit`, `description`, `image`, `min_stock`, `max_stock`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'SP001', 'Laptop Dell Inspiron 15', NULL, 7, 'cái', 'Laptop Dell Inspiron 15 3000 Series', NULL, 10, 100, 'active', '2026-01-12 03:04:33', '2026-01-12 03:04:33'),
+(2, 'SP002', 'Chuột Logitech M185', NULL, 7, 'cái', 'Chuột không dây Logitech M185', NULL, 20, 200, 'active', '2026-01-12 03:04:33', '2026-01-12 03:04:33'),
+(3, 'SP003', 'Bàn phím Logitech K120', NULL, 7, 'cái', 'Bàn phím có dây Logitech K120', NULL, 15, 150, 'active', '2026-01-12 03:04:33', '2026-01-12 03:04:33'),
+(4, 'SP004', 'Bút bi Thiên Long TL-027', NULL, 7, 'cây', 'Bút bi Thiên Long TL-027', NULL, 100, 1000, 'active', '2026-01-12 03:04:33', '2026-01-12 03:04:33'),
+(5, 'SP005', 'Giấy A4 Double A', NULL, 7, 'ream', 'Giấy A4 Double A 70gsm', NULL, 50, 500, 'active', '2026-01-12 03:04:33', '2026-01-12 03:04:33'),
+(6, 'SP006', 'Mì gói Hảo Hảo', NULL, 7, 'thùng', 'Mì gói Hảo Hảo 30 gói/thùng', NULL, 20, 200, 'active', '2026-01-12 03:04:33', '2026-01-12 03:04:33'),
+(7, 'NL-001', 'Đường trắng', NULL, 4, 'kg', 'Đường tinh luyện trắng', NULL, 100, 1000, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
+(8, 'NL-002', 'Bột mì', NULL, 4, 'kg', 'Bột mì đa dụng', NULL, 200, 2000, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
+(9, 'NL-003', 'Hương liệu vani', NULL, 4, 'lít', 'Hương liệu tổng hợp', NULL, 10, 100, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
+(10, 'NL-004', 'Bao bì carton', NULL, 4, 'cái', 'Hộp carton đựng sản phẩm', NULL, 500, 5000, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
+(11, 'NNL-001', 'Than đá', NULL, 5, 'tấn', 'Than đá công nghiệp', NULL, 5, 50, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
+(12, 'NNL-002', 'Dầu diesel', NULL, 5, 'lít', 'Dầu diesel cho máy phát điện', NULL, 100, 1000, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
+(13, 'PT-001', 'Băng tải', NULL, 6, 'mét', 'Băng tải cao su', NULL, 10, 100, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
+(14, 'PT-002', 'Motor điện 3HP', NULL, 6, 'cái', 'Motor điện công suất 3HP', NULL, 2, 20, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
+(15, 'PT-003', 'Vòng bi SKF', NULL, 6, 'cái', 'Vòng bi chất lượng cao', NULL, 20, 200, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
+(16, 'TP-001', 'Bánh quy bơ', NULL, 7, 'hộp', 'Bánh quy bơ hộp 200g', NULL, 100, 1000, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
+(17, 'TP-002', 'Kẹo sữa', NULL, 7, 'hộp', 'Kẹo sữa hộp 500g', NULL, 200, 2000, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36'),
+(18, 'TP-003', 'Bánh chocolate', NULL, 7, 'hộp', 'Bánh chocolate hộp 300g', NULL, 150, 1500, 'active', '2026-01-12 06:05:36', '2026-01-12 06:05:36');
 
 -- --------------------------------------------------------
 

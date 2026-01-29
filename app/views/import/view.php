@@ -96,6 +96,7 @@
                                 <th>STT</th>
                                 <th>Mã SP</th>
                                 <th>Tên sản phẩm</th>
+                                <th>Loại mặt hàng</th>
                                 <th>ĐVT</th>
                                 <th class="text-end">Số lượng</th>
                                 <th class="text-end">Đơn giá</th>
@@ -108,7 +109,7 @@
                         <tbody>
                             <?php if (empty($details)): ?>
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted">
+                                    <td colspan="<?= ($import['status'] !== 'approved' && Auth::hasPermission('import.edit')) ? 9 : 8 ?>" class="text-center text-muted">
                                         <i class="ti ti-package-off fs-1 mb-2"></i>
                                         <p>Chưa có sản phẩm nào</p>
                                     </td>
@@ -126,6 +127,7 @@
                                             <i class="ti ti-alert-triangle text-danger ms-1" title="Vượt mức tồn kho"></i>
                                         <?php endif; ?>
                                     </td>
+                                        <td><?= htmlspecialchars($detail['product_type_name'] ?? '-') ?></td>
                                         <td><?= htmlspecialchars($detail['unit']) ?></td>
                                         <td class="text-end"><?= number_format($detail['quantity'], 2) ?></td>
                                         <td class="text-end"><?= number_format($detail['unit_price']) ?> đ</td>
@@ -206,6 +208,9 @@
                                         <?php foreach ($products as $product): ?>
                                             <option value="<?= $product['id'] ?>">
                                                 <?= htmlspecialchars($product['code']) ?> - <?= htmlspecialchars($product['name']) ?>
+                                                <?php if (!empty($product['product_type_name'])): ?>
+                                                    - <?= htmlspecialchars($product['product_type_name']) ?>
+                                                <?php endif; ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
