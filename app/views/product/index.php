@@ -85,9 +85,7 @@
                                         </td>
                                         <td><strong><?= htmlspecialchars($product['code']) ?></strong></td>
                                         <td><?= htmlspecialchars($product['name']) ?></td>
-                                        <td>
-                                            <?= htmlspecialchars($product['product_type_name'] ?? '-') ?>
-                                        </td>
+                                        <td><?= htmlspecialchars($product['latest_product_type_name'] ?? '-') ?></td>
                                         <td>
                                             <?php if (!empty($product['warehouse_name'])): ?>
                                                 <span class="badge bg-azure-lt"><?= htmlspecialchars($product['warehouse_name']) ?></span>

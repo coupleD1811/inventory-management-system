@@ -52,23 +52,6 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">Loại mặt hàng</label>
-                                <input type="text" name="product_type_name" class="form-control"
-                                       list="product-type-list"
-                                       placeholder="VD: Đường tinh luyện - Công ty A"
-                                       value="<?= htmlspecialchars($product['product_type_name'] ?? '') ?>">
-                                <datalist id="product-type-list">
-                                    <?php foreach ($productTypes as $type): ?>
-                                        <option value="<?= htmlspecialchars($type['name']) ?>"></option>
-                                    <?php endforeach; ?>
-                                </datalist>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
                                 <label class="form-label">Đơn vị tính</label>
                                 <input type="text" name="unit" class="form-control" 
                                        placeholder="VD: cái, hộp, thùng..." 

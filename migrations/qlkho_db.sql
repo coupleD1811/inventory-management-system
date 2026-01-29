@@ -98,6 +98,7 @@ CREATE TABLE `export_details` (
   `id` int NOT NULL,
   `export_id` int NOT NULL,
   `product_id` int NOT NULL,
+  `product_type_id` int DEFAULT NULL,
   `quantity` int NOT NULL,
   `unit_price` decimal(15,2) NOT NULL,
   `cost_price` decimal(15,2) DEFAULT '0.00' COMMENT 'Giá vốn',
@@ -149,6 +150,7 @@ CREATE TABLE `import_details` (
   `id` int NOT NULL,
   `import_id` int NOT NULL,
   `product_id` int NOT NULL,
+  `product_type_id` int DEFAULT NULL,
   `quantity` int NOT NULL,
   `unit_price` decimal(15,2) NOT NULL,
   `total_price` decimal(15,2) NOT NULL,
@@ -161,10 +163,10 @@ CREATE TABLE `import_details` (
 -- Đang đổ dữ liệu cho bảng `import_details`
 --
 
-INSERT INTO `import_details` (`id`, `import_id`, `product_id`, `quantity`, `unit_price`, `total_price`, `notes`, `created_at`, `updated_at`) VALUES
-(1, 1, 16, 1, 200000.00, 200000.00, NULL, '2026-01-15 03:56:15', '2026-01-15 03:56:15'),
-(2, 1, 17, 1, 200000.00, 200000.00, NULL, '2026-01-15 03:56:15', '2026-01-15 03:56:15'),
-(3, 1, 16, 20, 100000.00, 2000000.00, NULL, '2026-01-15 03:59:20', '2026-01-15 03:59:20');
+INSERT INTO `import_details` (`id`, `import_id`, `product_id`, `product_type_id`, `quantity`, `unit_price`, `total_price`, `notes`, `created_at`, `updated_at`) VALUES
+(1, 1, 16, NULL, 1, 200000.00, 200000.00, NULL, '2026-01-15 03:56:15', '2026-01-15 03:56:15'),
+(2, 1, 17, NULL, 1, 200000.00, 200000.00, NULL, '2026-01-15 03:56:15', '2026-01-15 03:56:15'),
+(3, 1, 16, NULL, 20, 100000.00, 2000000.00, NULL, '2026-01-15 03:59:20', '2026-01-15 03:59:20');
 
 -- --------------------------------------------------------
 

@@ -105,6 +105,7 @@
                         $cardProduct = $card['product'];
                         $cardTransactions = $card['transactions'];
                         $warning = $productWarnings[$cardProduct['id']] ?? null;
+                        $warningDetail = $productWarningDetails[$cardProduct['id']] ?? null;
                         ?>
                         <div class="card bg-light mb-4">
                             <div class="card-body">
@@ -121,6 +122,19 @@
                                         <i class="ti ti-file-export me-2"></i>Xuất báo cáo (In/PDF)
                                     </button>
                                 </div>
+                                <?php if ($warningDetail): ?>
+                                    <div class="mb-3">
+                                        <?php if ($warningDetail === 'near_min'): ?>
+                                            <span class="text-warning">Mặt hàng sắp vượt mức tối thiểu</span>
+                                        <?php elseif ($warningDetail === 'near_max'): ?>
+                                            <span class="text-warning">Mặt hàng sắp vượt mức tối đa</span>
+                                        <?php elseif ($warningDetail === 'over_min'): ?>
+                                            <span class="text-danger">Mặt hàng đã vượt mức tối thiểu</span>
+                                        <?php elseif ($warningDetail === 'over_max'): ?>
+                                            <span class="text-danger">Mặt hàng đã vượt mức tối đa</span>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
 
                                 <div class="table-responsive">
                                     <table class="table table-vcenter card-table table-bordered">
@@ -163,7 +177,7 @@
                                                                 <?= htmlspecialchars($trans['reference_code']) ?>
                                                             </a>
                                                         </td>
-                                                        <td><?= htmlspecialchars($cardProduct['product_type_name'] ?? '-') ?></td>
+                                                        <td><?= htmlspecialchars($trans['product_type_name'] ?? '-') ?></td>
                                                         <td class="text-end">
                                                             <?php if ($trans['transaction_type'] === 'import'): ?>
                                                                 <strong class="text-success">+<?= number_format($trans['quantity'], 2) ?></strong>
@@ -193,6 +207,18 @@
                         </div>
                     <?php endforeach; ?>
                 <?php elseif ($product && $warehouse): ?>
+                    <?php
+                    $warningDetail = $productWarningDetails[$product['id']] ?? null;
+                    $latestTypeName = null;
+                    if (!empty($transactions)) {
+                        for ($i = count($transactions) - 1; $i >= 0; $i--) {
+                            if (!empty($transactions[$i]['product_type_name'])) {
+                                $latestTypeName = $transactions[$i]['product_type_name'];
+                                break;
+                            }
+                        }
+                    }
+                    ?>
                     <div class="card bg-light mb-4">
                         <div class="card-body">
                             <div class="row">
@@ -209,7 +235,7 @@
                                         </tr>
                                         <tr>
                                             <td><strong>Loại mặt hàng:</strong></td>
-                                            <td><?= htmlspecialchars($product['product_type_name'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($latestTypeName ?? '-') ?></td>
                                         </tr>
                                         <tr>
                                             <td><strong>Đơn vị tính:</strong></td>
@@ -228,6 +254,19 @@
                                     </table>
                                 </div>
                                 <div class="col-md-6">
+                                    <?php if ($warningDetail): ?>
+                                        <div class="alert alert-light">
+                                            <?php if ($warningDetail === 'near_min'): ?>
+                                                <span class="text-warning">Mặt hàng sắp vượt mức tối thiểu</span>
+                                            <?php elseif ($warningDetail === 'near_max'): ?>
+                                                <span class="text-warning">Mặt hàng sắp vượt mức tối đa</span>
+                                            <?php elseif ($warningDetail === 'over_min'): ?>
+                                                <span class="text-danger">Mặt hàng đã vượt mức tối thiểu</span>
+                                            <?php elseif ($warningDetail === 'over_max'): ?>
+                                                <span class="text-danger">Mặt hàng đã vượt mức tối đa</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
                                     <h4 class="mb-3">Mức dự trữ & Giá</h4>
                                     <table class="table table-borderless mb-0">
                                         <tr>
@@ -346,7 +385,7 @@
                                                     <?= htmlspecialchars($trans['reference_code']) ?>
                                                 </a>
                                             </td>
-                                            <td><?= htmlspecialchars($product['product_type_name'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($trans['product_type_name'] ?? '-') ?></td>
                                             <td class="text-end">
                                                 <?php if ($trans['transaction_type'] === 'import'): ?>
                                                     <strong class="text-success">+<?= number_format($trans['quantity'], 2) ?></strong>

@@ -165,10 +165,12 @@ class ImportController extends Controller
 
         $importDetailModel = $this->model('ImportDetail');
         $productModel = $this->model('Product');
+        $productTypeModel = $this->model('ProductType');
         $inventoryModel = $this->model('Inventory');
         
         $details = $importDetailModel->getByImport($id);
         $products = $productModel->getByWarehouse($import['warehouse_id']);
+        $productTypes = $productTypeModel->getAllActive();
         $detailWarnings = [];
         if (!empty($details)) {
             $productTotals = [];
@@ -191,6 +193,7 @@ class ImportController extends Controller
             'import' => $import,
             'details' => $details,
             'products' => $products,
+            'productTypes' => $productTypes,
             'detailWarnings' => $detailWarnings
         ]);
     }
@@ -255,16 +258,18 @@ class ImportController extends Controller
             // Xử lý từng sản phẩm (MỚI)
             foreach ($products as $product) {
                 $productId = $product['product_id'] ?? null;
+                $productTypeId = $product['product_type_id'] ?? null;
                 $quantity = $product['quantity'] ?? 0;
                 $unitPrice = $product['unit_price'] ?? 0;
                 
-                if ($productId && $quantity > 0 && $unitPrice >= 0) {
+                if ($productId && $productTypeId && $quantity > 0 && $unitPrice >= 0) {
                     if (!$productModel->belongsToWarehouse($productId, $import['warehouse_id'])) {
                         continue;
                     }
                     $data = [
                         'import_id' => $id,
                         'product_id' => $productId,
+                        'product_type_id' => $productTypeId,
                         'quantity' => $quantity,
                         'unit_price' => $unitPrice,
                         'total_price' => $quantity * $unitPrice
