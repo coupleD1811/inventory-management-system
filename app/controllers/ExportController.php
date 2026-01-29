@@ -241,6 +241,7 @@ class ExportController extends Controller
             $inventoryModel = $this->model('Inventory');
             $exportDetailModel = $this->model('ExportDetail');
             $productModel = $this->model('Product');
+            $productTypeModel = $this->model('ProductType');
             $successCount = 0;
             
             // Xử lý từng sản phẩm (MỚI)
@@ -252,6 +253,9 @@ class ExportController extends Controller
                 
                 if ($productId && $productTypeId && $quantity > 0 && $unitPrice >= 0) {
                     if (!$productModel->belongsToWarehouse($productId, $export['warehouse_id'])) {
+                        continue;
+                    }
+                    if (!$productTypeModel->belongsToProduct($productTypeId, $productId)) {
                         continue;
                     }
                     // Lấy giá vốn từ inventory

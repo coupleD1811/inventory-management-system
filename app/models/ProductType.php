@@ -10,6 +10,13 @@ class ProductType extends Model
         return $this->query($sql);
     }
 
+    public function belongsToProduct($typeId, $productId)
+    {
+        $sql = "SELECT id FROM {$this->table} WHERE id = ? AND product_id = ?";
+        $result = $this->query($sql, [$typeId, $productId]);
+        return !empty($result);
+    }
+
     public function findByName($name)
     {
         $sql = "SELECT * FROM {$this->table} WHERE name = ?";

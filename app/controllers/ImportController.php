@@ -253,6 +253,7 @@ class ImportController extends Controller
             
             $importDetailModel = $this->model('ImportDetail');
             $productModel = $this->model('Product');
+            $productTypeModel = $this->model('ProductType');
             $successCount = 0;
             
             // Xử lý từng sản phẩm (MỚI)
@@ -264,6 +265,9 @@ class ImportController extends Controller
                 
                 if ($productId && $productTypeId && $quantity > 0 && $unitPrice >= 0) {
                     if (!$productModel->belongsToWarehouse($productId, $import['warehouse_id'])) {
+                        continue;
+                    }
+                    if (!$productTypeModel->belongsToProduct($productTypeId, $productId)) {
                         continue;
                     }
                     $data = [
