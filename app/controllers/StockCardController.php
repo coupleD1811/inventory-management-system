@@ -49,7 +49,7 @@ class StockCardController extends Controller
                     $endDate
                 );
 
-                $product = $this->productModel->find($productId);
+                $product = $this->productModel->findWithType($productId);
                 $warehouse = $this->warehouseModel->find($warehouseId);
             }
         }

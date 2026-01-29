@@ -4,12 +4,14 @@ class ProductController extends Controller
 {
     private $productModel;
     private $warehouseModel;
+    private $productTypeModel;
 
     public function __construct()
     {
         Auth::requireLogin();
         $this->productModel = $this->model('Product');
         $this->warehouseModel = $this->model('Warehouse');
+        $this->productTypeModel = $this->model('ProductType');
     }
 
     public function index()
@@ -52,6 +54,7 @@ class ProductController extends Controller
             $name = trim($_POST['name'] ?? '');
             $warehouseId = $_POST['warehouse_id'] ?? null;
             $unit = trim($_POST['unit'] ?? 'cái');
+            $productTypeName = trim($_POST['product_type_name'] ?? '');
             $description = trim($_POST['description'] ?? '');
             $minStock = (int)($_POST['min_stock'] ?? 0);
             $maxStock = (int)($_POST['max_stock'] ?? 0);
@@ -98,6 +101,7 @@ class ProductController extends Controller
                 'code' => $code,
                 'name' => $name,
                 'warehouse_id' => $warehouseId,
+                'product_type_id' => $this->productTypeModel->getOrCreate($productTypeName),
                 'unit' => $unit,
                 'description' => $description,
                 'image' => $imagePath,
@@ -116,7 +120,8 @@ class ProductController extends Controller
 
         $this->view('product/create', [
             'title' => 'Thêm sản phẩm',
-            'warehouses' => $this->warehouseModel->getPrimaryWarehouses()
+            'warehouses' => $this->warehouseModel->getPrimaryWarehouses(),
+            'productTypes' => $this->productTypeModel->getAllActive()
         ]);
     }
 
@@ -124,7 +129,7 @@ class ProductController extends Controller
     {
         Auth::requirePermission('product.edit');
 
-        $product = $this->productModel->find($id);
+        $product = $this->productModel->findWithType($id);
         if (!$product) {
             $_SESSION['error'] = 'Không tìm thấy sản phẩm!';
             $this->redirect('product');
@@ -136,6 +141,7 @@ class ProductController extends Controller
             $name = trim($_POST['name'] ?? '');
             $warehouseId = $_POST['warehouse_id'] ?? null;
             $unit = trim($_POST['unit'] ?? 'cái');
+            $productTypeName = trim($_POST['product_type_name'] ?? '');
             $description = trim($_POST['description'] ?? '');
             $minStock = (int)($_POST['min_stock'] ?? 0);
             $maxStock = (int)($_POST['max_stock'] ?? 0);
@@ -182,6 +188,7 @@ class ProductController extends Controller
                 'code' => $code,
                 'name' => $name,
                 'warehouse_id' => $warehouseId,
+                'product_type_id' => $this->productTypeModel->getOrCreate($productTypeName),
                 'unit' => $unit,
                 'description' => $description,
                 'image' => $imagePath,
@@ -201,7 +208,8 @@ class ProductController extends Controller
         $this->view('product/edit', [
             'title' => 'Sửa sản phẩm',
             'product' => $product,
-            'warehouses' => $this->warehouseModel->getPrimaryWarehouses()
+            'warehouses' => $this->warehouseModel->getPrimaryWarehouses(),
+            'productTypes' => $this->productTypeModel->getAllActive()
         ]);
     }
 

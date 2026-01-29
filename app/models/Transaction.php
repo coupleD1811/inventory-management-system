@@ -10,6 +10,7 @@ class Transaction extends Model
     public function getStockCard($warehouseId, $productId, $startDate = null, $endDate = null)
     {
         $sql = "SELECT t.*, w.name as warehouse_name, p.name as product_name, p.code as product_code,
+                       pt.name as product_type_name,
                        u.full_name as created_by_name,
                        CASE 
                            WHEN t.reference_type = 'import' THEN (
@@ -29,6 +30,7 @@ class Transaction extends Model
                 FROM {$this->table} t
                 INNER JOIN warehouses w ON t.warehouse_id = w.id
                 INNER JOIN products p ON t.product_id = p.id
+                LEFT JOIN product_types pt ON p.product_type_id = pt.id
                 LEFT JOIN users u ON t.created_by = u.id
                 WHERE t.warehouse_id = ? AND t.product_id = ?";
         
@@ -62,9 +64,10 @@ class Transaction extends Model
      */
     public function getByReference($referenceType, $referenceId)
     {
-        $sql = "SELECT t.*, p.name as product_name, p.code as product_code
+        $sql = "SELECT t.*, p.name as product_name, p.code as product_code, pt.name as product_type_name
                 FROM {$this->table} t
                 INNER JOIN products p ON t.product_id = p.id
+                LEFT JOIN product_types pt ON p.product_type_id = pt.id
                 WHERE t.reference_type = ? AND t.reference_id = ?
                 ORDER BY t.id";
         return $this->query($sql, [$referenceType, $referenceId]);
@@ -75,10 +78,11 @@ class Transaction extends Model
      */
     public function getRecent($limit = 50)
     {
-        $sql = "SELECT t.*, w.name as warehouse_name, p.name as product_name, p.code as product_code
+        $sql = "SELECT t.*, w.name as warehouse_name, p.name as product_name, p.code as product_code, pt.name as product_type_name
                 FROM {$this->table} t
                 INNER JOIN warehouses w ON t.warehouse_id = w.id
                 INNER JOIN products p ON t.product_id = p.id
+                LEFT JOIN product_types pt ON p.product_type_id = pt.id
                 ORDER BY t.transaction_date DESC, t.id DESC
                 LIMIT ?";
         return $this->query($sql, [$limit]);

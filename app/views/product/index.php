@@ -52,6 +52,7 @@
                                 <th>Ảnh</th>
                                 <th>Mã SP</th>
                                 <th>Tên sản phẩm</th>
+                                <th>Loại mặt hàng</th>
                                 <th>Kho</th>
                                 <th>Đơn vị</th>
                                 <th>Tồn kho</th>
@@ -62,7 +63,7 @@
                         <tbody>
                             <?php if (empty($products)): ?>
                                 <tr>
-                                    <td colspan="9" class="text-center text-muted">
+                                    <td colspan="10" class="text-center text-muted">
                                         <i class="ti ti-box-off fs-1 mb-2"></i>
                                         <p>Không có dữ liệu</p>
                                     </td>
@@ -84,6 +85,9 @@
                                         </td>
                                         <td><strong><?= htmlspecialchars($product['code']) ?></strong></td>
                                         <td><?= htmlspecialchars($product['name']) ?></td>
+                                        <td>
+                                            <?= htmlspecialchars($product['product_type_name'] ?? '-') ?>
+                                        </td>
                                         <td>
                                             <?php if (!empty($product['warehouse_name'])): ?>
                                                 <span class="badge bg-azure-lt"><?= htmlspecialchars($product['warehouse_name']) ?></span>

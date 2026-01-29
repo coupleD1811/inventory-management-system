@@ -7,9 +7,10 @@ class ImportDetail extends Model
     public function getByImport($importId)
     {
         $sql = "SELECT id.*, p.code as product_code, p.name as product_name, p.unit,
-                       p.min_stock, p.max_stock
+                       p.min_stock, p.max_stock, pt.name as product_type_name
                 FROM {$this->table} id
                 INNER JOIN products p ON id.product_id = p.id
+                LEFT JOIN product_types pt ON p.product_type_id = pt.id
                 WHERE id.import_id = ?
                 ORDER BY id.id";
         return $this->query($sql, [$importId]);
