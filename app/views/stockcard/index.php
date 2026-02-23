@@ -144,10 +144,11 @@
                                                 <th>Ngày</th>
                                                 <th>Loại</th>
                                                 <th>Số chứng từ</th>
+                                                <th class="text-end">Tồn trước</th>
                                                 <th>Loại mặt hàng</th>
                                                 <th class="text-end">Số lượng nhập</th>
                                                 <th class="text-end">Số lượng xuất</th>
-                                                <th class="text-end">Tồn kho</th>
+                                                <th class="text-end">Tồn sau</th>
                                                 <th>Người thực hiện</th>
                                                 <th>Ghi chú</th>
                                             </tr>
@@ -155,7 +156,7 @@
                                         <tbody>
                                             <?php if (empty($cardTransactions)): ?>
                                                 <tr>
-                                                    <td colspan="10" class="text-center text-muted">
+                                                    <td colspan="11" class="text-center text-muted">
                                                         <i class="ti ti-file-off fs-1 mb-2"></i>
                                                         <p>Không có giao dịch nào</p>
                                                     </td>
@@ -177,6 +178,7 @@
                                                                 <?= htmlspecialchars($trans['reference_code']) ?>
                                                             </a>
                                                         </td>
+                                                        <td class="text-end"><?= number_format($trans['balance_before'], 2) ?></td>
                                                         <td><?= htmlspecialchars($trans['product_type_name'] ?? '-') ?></td>
                                                         <td class="text-end">
                                                             <?php if ($trans['transaction_type'] === 'import'): ?>
@@ -347,23 +349,24 @@
                     <div class="table-responsive">
                         <table class="table table-vcenter card-table table-bordered">
                             <thead>
-                                <tr class="bg-primary text-white">
-                                    <th>STT</th>
-                                    <th>Ngày</th>
-                                    <th>Loại</th>
-                                    <th>Số chứng từ</th>
-                                    <th>Loại mặt hàng</th>
-                                    <th class="text-end">Số lượng nhập</th>
-                                    <th class="text-end">Số lượng xuất</th>
-                                    <th class="text-end">Tồn kho</th>
-                                    <th>Người thực hiện</th>
-                                    <th>Ghi chú</th>
-                                </tr>
+                                            <tr class="bg-primary text-white">
+                                                <th>STT</th>
+                                                <th>Ngày</th>
+                                                <th>Loại</th>
+                                                <th>Số chứng từ</th>
+                                                <th class="text-end">Tồn trước</th>
+                                                <th>Loại mặt hàng</th>
+                                                <th class="text-end">Số lượng nhập</th>
+                                                <th class="text-end">Số lượng xuất</th>
+                                                <th class="text-end">Tồn sau</th>
+                                                <th>Người thực hiện</th>
+                                                <th>Ghi chú</th>
+                                            </tr>
                             </thead>
                             <tbody>
                                 <?php if (empty($transactions)): ?>
                                     <tr>
-                                        <td colspan="10" class="text-center text-muted">
+                                        <td colspan="11" class="text-center text-muted">
                                             <i class="ti ti-file-off fs-1 mb-2"></i>
                                             <p>Không có giao dịch nào</p>
                                         </td>
@@ -385,6 +388,7 @@
                                                     <?= htmlspecialchars($trans['reference_code']) ?>
                                                 </a>
                                             </td>
+                                            <td class="text-end"><?= number_format($trans['balance_before'], 2) ?></td>
                                             <td><?= htmlspecialchars($trans['product_type_name'] ?? '-') ?></td>
                                             <td class="text-end">
                                                 <?php if ($trans['transaction_type'] === 'import'): ?>

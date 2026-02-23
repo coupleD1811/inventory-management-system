@@ -349,4 +349,126 @@ class Inventory extends Model
         }
         return null;
     }
+
+    public function getStatusLabelFromDetail($detail)
+    {
+        $labels = [
+            'over_min' => 'Thấp hơn mức tối thiểu',
+            'over_max' => 'Vượt mức tối đa',
+            'near_min' => 'Sắp chạm mức tối thiểu',
+            'near_max' => 'Sắp chạm mức tối đa',
+        ];
+
+        return $labels[$detail] ?? null;
+    }
+
+    public function getPostTransactionAlerts($warehouseId, array $productIds)
+    {
+        $productIds = array_values(array_unique(array_filter(array_map('intval', $productIds))));
+        if (empty($productIds)) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($productIds), '?'));
+        $sql = "SELECT i.product_id, i.quantity, p.code as product_code, p.name as product_name, p.min_stock, p.max_stock
+                FROM {$this->table} i
+                INNER JOIN products p ON i.product_id = p.id
+                WHERE i.warehouse_id = ? AND i.product_id IN ($placeholders)";
+
+        $params = array_merge([(int)$warehouseId], $productIds);
+        $rows = $this->query($sql, $params);
+        $alerts = [];
+
+        foreach ($rows as $row) {
+            $detail = $this->getWarningDetailForQuantity(
+                (float)$row['quantity'],
+                $row['min_stock'],
+                $row['max_stock']
+            );
+
+            if (!$detail) {
+                continue;
+            }
+
+            $alerts[] = [
+                'product_id' => (int)$row['product_id'],
+                'product_code' => $row['product_code'],
+                'product_name' => $row['product_name'],
+                'quantity' => (float)$row['quantity'],
+                'min_stock' => (float)$row['min_stock'],
+                'max_stock' => (float)$row['max_stock'],
+                'detail' => $detail,
+                'label' => $this->getStatusLabelFromDetail($detail),
+            ];
+        }
+
+        return $alerts;
+    }
+
+    public function getMovementReport($startDate, $endDate, $warehouseId = null, $keyword = null)
+    {
+        $sql = "SELECT
+                    i.warehouse_id,
+                    w.name as warehouse_name,
+                    i.product_id,
+                    p.code as product_code,
+                    p.name as product_name,
+                    p.unit,
+                    p.min_stock,
+                    p.max_stock,
+                    COALESCE(i.quantity, 0) as current_quantity,
+                    COALESCE(period.import_qty, 0) as import_qty,
+                    COALESCE(period.export_qty, 0) as export_qty,
+                    (COALESCE(i.quantity, 0) - COALESCE(from_start.net_qty, 0)) as opening_qty,
+                    (COALESCE(i.quantity, 0) - COALESCE(after_end.net_qty, 0)) as closing_qty
+                FROM {$this->table} i
+                INNER JOIN products p ON i.product_id = p.id
+                INNER JOIN warehouses w ON i.warehouse_id = w.id
+                LEFT JOIN (
+                    SELECT
+                        t.warehouse_id,
+                        t.product_id,
+                        SUM(CASE WHEN t.transaction_type = 'import' THEN t.quantity ELSE 0 END) as import_qty,
+                        SUM(CASE WHEN t.transaction_type = 'export' THEN t.quantity ELSE 0 END) as export_qty
+                    FROM transactions t
+                    WHERE DATE(t.transaction_date) BETWEEN ? AND ?
+                    GROUP BY t.warehouse_id, t.product_id
+                ) period ON period.warehouse_id = i.warehouse_id AND period.product_id = i.product_id
+                LEFT JOIN (
+                    SELECT
+                        t.warehouse_id,
+                        t.product_id,
+                        SUM(CASE WHEN t.transaction_type = 'import' THEN t.quantity ELSE -t.quantity END) as net_qty
+                    FROM transactions t
+                    WHERE DATE(t.transaction_date) >= ?
+                    GROUP BY t.warehouse_id, t.product_id
+                ) from_start ON from_start.warehouse_id = i.warehouse_id AND from_start.product_id = i.product_id
+                LEFT JOIN (
+                    SELECT
+                        t.warehouse_id,
+                        t.product_id,
+                        SUM(CASE WHEN t.transaction_type = 'import' THEN t.quantity ELSE -t.quantity END) as net_qty
+                    FROM transactions t
+                    WHERE DATE(t.transaction_date) > ?
+                    GROUP BY t.warehouse_id, t.product_id
+                ) after_end ON after_end.warehouse_id = i.warehouse_id AND after_end.product_id = i.product_id
+                WHERE p.status = 'active'";
+
+        $params = [$startDate, $endDate, $startDate, $endDate];
+
+        if ($warehouseId) {
+            $sql .= " AND i.warehouse_id = ?";
+            $params[] = $warehouseId;
+        }
+
+        if ($keyword) {
+            $sql .= " AND (p.code LIKE ? OR p.name LIKE ?)";
+            $params[] = "%{$keyword}%";
+            $params[] = "%{$keyword}%";
+        }
+
+        $sql .= " ORDER BY w.name, p.name";
+
+        return $this->query($sql, $params);
+    }
 }

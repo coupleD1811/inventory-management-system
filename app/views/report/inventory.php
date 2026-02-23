@@ -1,7 +1,7 @@
 <?php require_once '../app/views/layouts/header.php'; ?>
 
 <div class="row row-cards mb-3">
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div class="card">
             <div class="card-body">
                 <div class="d-flex align-items-center">
@@ -11,7 +11,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div class="card">
             <div class="card-body">
                 <div class="d-flex align-items-center">
@@ -21,7 +21,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div class="card">
             <div class="card-body">
                 <div class="d-flex align-items-center">
@@ -31,13 +31,23 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div class="card">
             <div class="card-body">
                 <div class="d-flex align-items-center">
                     <div class="subheader">Vượt mức tối đa</div>
                 </div>
                 <div class="h1 mb-0 text-warning"><?= number_format($stats['overStock']) ?></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="subheader">Sắp chạm ngưỡng</div>
+                </div>
+                <div class="h1 mb-0 text-warning"><?= number_format($stats['nearStock'] ?? 0) ?></div>
             </div>
         </div>
     </div>
@@ -78,13 +88,14 @@
                                 <th>Sản phẩm</th>
                                 <th>Đơn vị</th>
                                 <th>Tồn kho</th>
+                                <th class="text-end">Min/Max</th>
                                 <th>Trạng thái</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($inventory)): ?>
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted">Không có dữ liệu</td>
+                                    <td colspan="6" class="text-center text-muted">Không có dữ liệu</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($inventory as $item): ?>
@@ -93,6 +104,7 @@
                                         <td><?= htmlspecialchars($item['product_name']) ?></td>
                                         <td><?= htmlspecialchars($item['unit']) ?></td>
                                         <td><strong><?= number_format($item['quantity']) ?></strong></td>
+                                        <td class="text-end text-muted"><?= number_format($item['min_stock'] ?? 0) ?> / <?= number_format($item['max_stock'] ?? 0) ?></td>
                                         <td>
                                             <?php
                                             $qty = $item['quantity'];
@@ -104,6 +116,8 @@
                                                 <span class="badge bg-danger">Dưới mức</span>
                                             <?php elseif ($qty > $max && $max > 0): ?>
                                                 <span class="badge bg-warning">Vượt mức</span>
+                                            <?php elseif (($min > 0 && $qty <= $min * 1.1) || ($max > 0 && $qty >= $max * 0.9)): ?>
+                                                <span class="badge bg-warning-lt text-warning">Sắp chạm ngưỡng</span>
                                             <?php else: ?>
                                                 <span class="badge bg-success">Bình thường</span>
                                             <?php endif; ?>
