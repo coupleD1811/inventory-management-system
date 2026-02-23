@@ -31,6 +31,7 @@ class ReportController extends Controller
         $totalQuantity = array_sum(array_column($inventory, 'quantity'));
         $lowStock = 0;
         $overStock = 0;
+        $nearStock = 0;
 
         foreach ($inventory as $item) {
             if ($item['quantity'] < ($item['min_stock'] ?? 0) && ($item['min_stock'] ?? 0) > 0) {
@@ -38,6 +39,20 @@ class ReportController extends Controller
             }
             if ($item['quantity'] > ($item['max_stock'] ?? 0) && ($item['max_stock'] ?? 0) > 0) {
                 $overStock++;
+            }
+            if (
+                (
+                    ($item['min_stock'] ?? 0) > 0 &&
+                    $item['quantity'] >= ($item['min_stock'] * 1.0) &&
+                    $item['quantity'] <= ($item['min_stock'] * 1.1)
+                ) ||
+                (
+                    ($item['max_stock'] ?? 0) > 0 &&
+                    $item['quantity'] <= ($item['max_stock'] * 1.0) &&
+                    $item['quantity'] >= ($item['max_stock'] * 0.9)
+                )
+            ) {
+                $nearStock++;
             }
         }
 
@@ -50,7 +65,8 @@ class ReportController extends Controller
                 'totalProducts' => $totalProducts,
                 'totalQuantity' => $totalQuantity,
                 'lowStock' => $lowStock,
-                'overStock' => $overStock
+                'overStock' => $overStock,
+                'nearStock' => $nearStock
             ]
         ];
 
@@ -247,5 +263,95 @@ class ReportController extends Controller
         ];
 
         $this->view('report/stock_take', $data);
+    }
+
+    public function movement()
+    {
+        Auth::requirePermission('report.view');
+
+        $period = $_GET['period'] ?? 'month';
+        $startDate = $_GET['start_date'] ?? null;
+        $endDate = $_GET['end_date'] ?? null;
+        $warehouseId = $_GET['warehouse_id'] ?? '';
+        $keyword = trim($_GET['keyword'] ?? '');
+
+        if (!$startDate || !$endDate) {
+            [$startDate, $endDate] = $this->resolvePeriodDates($period);
+        }
+
+        $rows = $this->inventoryModel->getMovementReport($startDate, $endDate, $warehouseId, $keyword);
+        $warehouses = $this->warehouseModel->getAllActive();
+
+        $stats = [
+            'opening' => 0,
+            'import' => 0,
+            'export' => 0,
+            'closing' => 0,
+            'items' => count($rows),
+        ];
+
+        foreach ($rows as &$row) {
+            $statusDetail = $this->inventoryModel->getWarningDetailForQuantity(
+                (float)$row['closing_qty'],
+                $row['min_stock'] ?? 0,
+                $row['max_stock'] ?? 0
+            );
+            $row['status_detail'] = $statusDetail;
+            $row['status_label'] = $this->inventoryModel->getStatusLabelFromDetail($statusDetail) ?? 'Bình thường';
+
+            $stats['opening'] += (float)$row['opening_qty'];
+            $stats['import'] += (float)$row['import_qty'];
+            $stats['export'] += (float)$row['export_qty'];
+            $stats['closing'] += (float)$row['closing_qty'];
+        }
+        unset($row);
+
+        $data = [
+            'title' => 'Báo cáo cân đối kho',
+            'rows' => $rows,
+            'warehouses' => $warehouses,
+            'period' => $period,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'warehouseId' => $warehouseId,
+            'keyword' => $keyword,
+            'stats' => $stats
+        ];
+
+        $this->view('report/movement', $data);
+    }
+
+    private function resolvePeriodDates($period)
+    {
+        $today = new DateTime('today');
+        $start = clone $today;
+        $end = clone $today;
+
+        switch ($period) {
+            case 'day':
+                break;
+            case 'week':
+                $start->modify('monday this week');
+                $end->modify('sunday this week');
+                break;
+            case 'quarter':
+                $month = (int)$today->format('n');
+                $quarterStartMonth = (int)(floor(($month - 1) / 3) * 3) + 1;
+                $start = new DateTime($today->format('Y') . '-' . str_pad($quarterStartMonth, 2, '0', STR_PAD_LEFT) . '-01');
+                $end = clone $start;
+                $end->modify('+2 months')->modify('last day of this month');
+                break;
+            case 'year':
+                $start = new DateTime($today->format('Y-01-01'));
+                $end = new DateTime($today->format('Y-12-31'));
+                break;
+            case 'month':
+            default:
+                $start->modify('first day of this month');
+                $end->modify('last day of this month');
+                break;
+        }
+
+        return [$start->format('Y-m-d'), $end->format('Y-m-d')];
     }
 }

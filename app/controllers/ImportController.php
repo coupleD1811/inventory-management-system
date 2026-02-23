@@ -360,6 +360,7 @@ class ImportController extends Controller
         $transactionModel = $this->model('Transaction');
 
         try {
+            $affectedProductIds = [];
             // Update inventory and log transactions
             foreach ($details as $detail) {
                 // Get current balance
@@ -399,6 +400,8 @@ class ImportController extends Controller
                     'transaction_date' => $import['import_date'] . ' ' . date('H:i:s'),
                     'created_by' => Auth::id()
                 ]);
+
+                $affectedProductIds[] = (int)$detail['product_id'];
             }
 
             // Update import status
@@ -408,7 +411,16 @@ class ImportController extends Controller
                 'approved_at' => date('Y-m-d H:i:s')
             ]);
 
-            $_SESSION['success'] = 'Duyệt phiếu nhập thành công!';
+            $alerts = $inventoryModel->getPostTransactionAlerts($import['warehouse_id'], $affectedProductIds);
+            $message = 'Duyệt phiếu nhập thành công!';
+            if (!empty($alerts)) {
+                $alertTexts = [];
+                foreach ($alerts as $alert) {
+                    $alertTexts[] = $alert['product_code'] . ' (' . $alert['label'] . ', tồn hiện tại: ' . number_format($alert['quantity'], 2) . ')';
+                }
+                $message .= ' Cảnh báo tồn kho: ' . implode('; ', $alertTexts) . '.';
+            }
+            $_SESSION['success'] = $message;
         } catch (Exception $e) {
             $_SESSION['error'] = 'Có lỗi xảy ra: ' . $e->getMessage();
         }
