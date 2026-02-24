@@ -4,12 +4,14 @@ class ExportController extends Controller
 {
     private $exportModel;
     private $warehouseModel;
+    private $auditLogModel;
 
     public function __construct()
     {
         Auth::requireLogin();
         $this->exportModel = $this->model('Export');
         $this->warehouseModel = $this->model('Warehouse');
+        $this->auditLogModel = $this->model('AuditLog');
     }
 
     public function index()
@@ -85,7 +87,16 @@ class ExportController extends Controller
                 'created_by' => Auth::id()
             ];
 
-            if ($this->exportModel->create($data)) {
+            $newExportId = $this->exportModel->create($data);
+            if ($newExportId) {
+                $this->logAudit(
+                    'create_export',
+                    'export',
+                    $newExportId,
+                    'Tạo phiếu xuất ' . $code,
+                    $code,
+                    ['warehouse_id' => (int)$warehouseId, 'export_date' => $exportDate]
+                );
                 $_SESSION['success'] = 'Tạo phiếu xuất thành công! Mã phiếu: ' . $code;
                 $this->redirect('export');
             } else {
@@ -204,6 +215,13 @@ class ExportController extends Controller
         }
 
         if ($this->exportModel->delete($id)) {
+            $this->logAudit(
+                'delete_export',
+                'export',
+                (int)$id,
+                'Xóa phiếu xuất ' . ($export['code'] ?? ('#' . $id)),
+                $export['code'] ?? null
+            );
             $_SESSION['success'] = 'Xóa phiếu xuất thành công!';
         } else {
             $_SESSION['error'] = 'Có lỗi xảy ra, vui lòng thử lại!';
@@ -290,6 +308,14 @@ class ExportController extends Controller
                 // Update total amount
                 $total = $exportDetailModel->getTotalAmount($id);
                 $this->exportModel->update($id, ['total_amount' => $total]);
+                $this->logAudit(
+                    'update_export_products',
+                    'export',
+                    (int)$id,
+                    'Thêm sản phẩm vào phiếu xuất ' . ($export['code'] ?? ('#' . $id)),
+                    $export['code'] ?? null,
+                    ['added_rows' => $successCount]
+                );
                 
                 $_SESSION['success'] = "Đã thêm $successCount sản phẩm thành công!";
             } else {
@@ -316,6 +342,14 @@ class ExportController extends Controller
             // Update total amount
             $total = $exportDetailModel->getTotalAmount($id);
             $this->exportModel->update($id, ['total_amount' => $total]);
+            $this->logAudit(
+                'remove_export_product',
+                'export',
+                (int)$id,
+                'Xóa sản phẩm khỏi phiếu xuất ' . ($export['code'] ?? ('#' . $id)),
+                $export['code'] ?? null,
+                ['detail_id' => (int)$detailId]
+            );
             
             $_SESSION['success'] = 'Xóa sản phẩm thành công!';
         } else {
@@ -431,6 +465,14 @@ class ExportController extends Controller
                 }
                 $message .= ' Cảnh báo tồn kho: ' . implode('; ', $alertTexts) . '.';
             }
+            $this->logAudit(
+                'approve_export',
+                'export',
+                (int)$id,
+                'Duyệt phiếu xuất ' . ($export['code'] ?? ('#' . $id)),
+                $export['code'] ?? null,
+                ['items' => count($details), 'alerts' => $alerts]
+            );
             $_SESSION['success'] = $message;
         } catch (Exception $e) {
             $_SESSION['error'] = 'Có lỗi xảy ra: ' . $e->getMessage();
@@ -481,11 +523,41 @@ class ExportController extends Controller
             'approved_at' => date('Y-m-d H:i:s'),
             'reject_reason' => $rejectReason
         ])) {
+            $this->logAudit(
+                'reject_export',
+                'export',
+                (int)$id,
+                'Từ chối phiếu xuất ' . ($export['code'] ?? ('#' . $id)),
+                $export['code'] ?? null,
+                ['reason' => $rejectReason]
+            );
             $_SESSION['success'] = 'Đã từ chối phiếu xuất!';
         } else {
             $_SESSION['error'] = 'Có lỗi xảy ra, vui lòng thử lại!';
         }
 
         $this->redirect('export');
+    }
+
+    private function logAudit($action, $entityType, $entityId, $description, $referenceCode = null, $metadata = [])
+    {
+        if (!$this->auditLogModel) {
+            return;
+        }
+
+        $user = Auth::user();
+        $this->auditLogModel->log([
+            'user_id' => Auth::id(),
+            'username' => $user['username'] ?? null,
+            'full_name' => $user['full_name'] ?? null,
+            'role_name' => $user['role_name'] ?? null,
+            'action' => $action,
+            'entity_type' => $entityType,
+            'entity_id' => $entityId,
+            'reference_code' => $referenceCode,
+            'description' => $description,
+            'metadata' => $metadata,
+            'ip_address' => $_SERVER['REMOTE_ADDR'] ?? null
+        ]);
     }
 }

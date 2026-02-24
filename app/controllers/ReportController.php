@@ -4,12 +4,14 @@ class ReportController extends Controller
 {
     private $inventoryModel;
     private $warehouseModel;
+    private $auditLogModel;
 
     public function __construct()
     {
         Auth::requireLogin();
         $this->inventoryModel = $this->model('Inventory');
         $this->warehouseModel = $this->model('Warehouse');
+        $this->auditLogModel = $this->model('AuditLog');
     }
 
     public function inventory()
@@ -263,6 +265,40 @@ class ReportController extends Controller
         ];
 
         $this->view('report/stock_take', $data);
+    }
+
+    public function audit()
+    {
+        Auth::requirePermission('report.view');
+
+        $startDate = $_GET['start_date'] ?? date('Y-m-01');
+        $endDate = $_GET['end_date'] ?? date('Y-m-d');
+        $action = $_GET['action'] ?? '';
+        $entityType = $_GET['entity_type'] ?? '';
+        $keyword = trim($_GET['keyword'] ?? '');
+
+        $filters = [
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'action' => $action,
+            'entity_type' => $entityType,
+            'keyword' => $keyword,
+            'limit' => 300
+        ];
+
+        $logs = $this->auditLogModel ? $this->auditLogModel->search($filters) : [];
+        $stats = $this->auditLogModel ? $this->auditLogModel->getStats($startDate, $endDate) : [];
+
+        $this->view('report/audit', [
+            'title' => 'Audit log',
+            'logs' => $logs,
+            'stats' => $stats,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'action' => $action,
+            'entityType' => $entityType,
+            'keyword' => $keyword
+        ]);
     }
 
     public function movement()

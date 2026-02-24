@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS `audit_logs` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int DEFAULT NULL,
+  `username` varchar(50) DEFAULT NULL,
+  `full_name` varchar(100) DEFAULT NULL,
+  `role_name` varchar(50) DEFAULT NULL,
+  `action` varchar(50) NOT NULL,
+  `entity_type` varchar(50) DEFAULT NULL,
+  `entity_id` int DEFAULT NULL,
+  `reference_code` varchar(50) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `metadata` text,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_action` (`action`),
+  KEY `idx_entity` (`entity_type`,`entity_id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_reference_code` (`reference_code`),
+  KEY `idx_created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

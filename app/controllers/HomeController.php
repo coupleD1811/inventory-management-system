@@ -99,6 +99,15 @@ class HomeController extends Controller
              LIMIT 5",
             [$startOfMonth, $endOfMonth]
         );
+
+        $lowStockTotal = $inventoryModel->query(
+            "SELECT COUNT(*) as total
+             FROM inventory i
+             INNER JOIN products p ON i.product_id = p.id
+             WHERE p.min_stock > 0 AND i.quantity < p.min_stock"
+        )[0]['total'] ?? 0;
+
+        $workbench = $this->buildWorkbench($pendingImports, $pendingExports, $lowStockTotal);
         
         $data = [
             'title' => 'Dashboard',
@@ -110,9 +119,86 @@ class HomeController extends Controller
             'pendingImports' => $pendingImports,
             'pendingExports' => $pendingExports,
             'topProducts' => $topProducts,
-            'currentMonth' => date('m/Y')
+            'currentMonth' => date('m/Y'),
+            'workbench' => $workbench
         ];
 
         $this->view('home/index', $data);
+    }
+
+    private function buildWorkbench($pendingImports, $pendingExports, $lowStockTotal)
+    {
+        $warehouseId = Auth::getWarehouseId();
+        $cards = [];
+        $quickLinks = [];
+        $title = 'Bảng công việc của bạn';
+        $subtitle = 'Các tác vụ ưu tiên cần xử lý ngay.';
+
+        if (Auth::isStorekeeper()) {
+            $warningCount = 0;
+            if ($warehouseId) {
+                $warningCount = $this->model('Inventory')->query(
+                    "SELECT COUNT(*) as total
+                     FROM inventory i
+                     INNER JOIN products p ON i.product_id = p.id
+                     WHERE i.warehouse_id = ?
+                     AND (
+                        (p.min_stock > 0 AND i.quantity <= p.min_stock * 1.1)
+                        OR (p.max_stock > 0 AND i.quantity >= p.max_stock * 0.9)
+                     )",
+                    [$warehouseId]
+                )[0]['total'] ?? 0;
+            }
+
+            $todayTransactions = 0;
+            if ($warehouseId) {
+                $todayTransactions = $this->model('Transaction')->query(
+                    "SELECT COUNT(*) as total
+                     FROM transactions
+                     WHERE warehouse_id = ? AND DATE(transaction_date) = CURDATE()",
+                    [$warehouseId]
+                )[0]['total'] ?? 0;
+            }
+
+            $cards = [
+                ['label' => 'Mặt hàng cần chú ý', 'count' => $warningCount, 'color' => 'warning', 'url' => 'inventory'],
+                ['label' => 'Giao dịch hôm nay', 'count' => $todayTransactions, 'color' => 'primary', 'url' => 'stock_card'],
+            ];
+        } else {
+            $approvedToday = $this->model('Import')->query(
+                "SELECT COUNT(*) as total FROM imports WHERE status = 'approved' AND DATE(approved_at) = CURDATE()"
+            )[0]['total'] ?? 0;
+            $approvedToday += $this->model('Export')->query(
+                "SELECT COUNT(*) as total FROM exports WHERE status = 'approved' AND DATE(approved_at) = CURDATE()"
+            )[0]['total'] ?? 0;
+
+            $cards = [
+                ['label' => 'Phiếu nhập chờ duyệt', 'count' => $pendingImports, 'color' => 'success', 'url' => 'import'],
+                ['label' => 'Phiếu xuất chờ duyệt', 'count' => $pendingExports, 'color' => 'warning', 'url' => 'export'],
+                ['label' => 'Mặt hàng dưới min', 'count' => $lowStockTotal, 'color' => 'danger', 'url' => 'report/inventory'],
+                ['label' => 'Phiếu đã duyệt hôm nay', 'count' => $approvedToday, 'color' => 'primary', 'url' => 'report/movement'],
+            ];
+        }
+
+        if (Auth::hasPermission('import.view')) {
+            $quickLinks[] = ['label' => 'Danh sách nhập kho', 'url' => 'import', 'icon' => 'ti ti-arrow-down-circle'];
+        }
+        if (Auth::hasPermission('export.view')) {
+            $quickLinks[] = ['label' => 'Danh sách xuất kho', 'url' => 'export', 'icon' => 'ti ti-arrow-up-circle'];
+        }
+        if (Auth::hasPermission('stock_card.view')) {
+            $quickLinks[] = ['label' => 'Thẻ kho', 'url' => 'stock_card', 'icon' => 'ti ti-file-text'];
+        }
+        if (Auth::hasPermission('report.view')) {
+            $quickLinks[] = ['label' => 'Báo cáo nhập-xuất-tồn', 'url' => 'report/movement', 'icon' => 'ti ti-table-options'];
+            $quickLinks[] = ['label' => 'Audit log', 'url' => 'report/audit', 'icon' => 'ti ti-history'];
+        }
+
+        return [
+            'title' => $title,
+            'subtitle' => $subtitle,
+            'cards' => $cards,
+            'quickLinks' => $quickLinks
+        ];
     }
 }
