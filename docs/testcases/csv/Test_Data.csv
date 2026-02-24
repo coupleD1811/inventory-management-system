@@ -1,0 +1,10 @@
+﻿Mã dữ liệu,Mô tả,Giá trị
+TD-USER-01,Tài khoản hợp lệ,admin/admin123; manager/manager123; staff/staff123
+TD-ROLE-01,Vai trò sử dụng,"Thủ kho, Quản lý kho, Giám đốc"
+TD-WH-01,Kho mẫu,"KHO-NL, KHO-NNL, KHO-PT, KHO-TP"
+TD-PROD-01,Sản phẩm có min/max,"NL-001(min=100,max=1000), TP-001(min=100,max=1000)"
+TD-IMP-01,Phiếu nhập chờ duyệt để test,Tạo mới từ module import
+TD-EXP-01,Phiếu xuất chờ duyệt để test,Tạo mới từ module export
+TD-ALERT-01,Dữ liệu cảnh báo gần/vượt ngưỡng,Điều chỉnh lượng nhập/xuất để chạm ngưỡng
+TD-DATE-01,Khoảng ngày test báo cáo,"Tháng hiện tại, tuần hiện tại, quý hiện tại"
+TD-AUD-01,Dữ liệu audit,Tạo/Duyệt/Từ chối/Xóa phiếu để phát sinh log

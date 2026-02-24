@@ -1,0 +1,9 @@
+﻿Chỉ số,Giá trị
+Dự án,QLKHO - Warehouse Management
+Ngày tạo,2026-02-24
+Tổng số test case,86
+Test case loại Chức năng,"=COUNTIF(Test_Cases!F:F,""Chức năng"")"
+Test case loại Âm,"=COUNTIF(Test_Cases!F:F,""Âm"")"
+Test case loại Kiểm tra dữ liệu,"=COUNTIF(Test_Cases!F:F,""Kiểm tra dữ liệu"")"
+Test case loại Bảo mật,"=COUNTIF(Test_Cases!F:F,""Bảo mật"")"
+Test case loại Giao diện/Khả dụng,"=COUNTIF(Test_Cases!F:F,""Giao diện"")+COUNTIF(Test_Cases!F:F,""Khả dụng"")"
