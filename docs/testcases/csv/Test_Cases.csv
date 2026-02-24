@@ -1,0 +1,111 @@
+﻿Tên chức năng,Module,Tính năng,Vai trò,Loại kiểm thử,Điều kiện tiên quyết,Dữ liệu kiểm thử,Các bước thực hiện,Kết quả mong đợi,Kết quả thực tế,Người kiểm thử,Ngày kiểm thử,Ghi chú
+Đăng nhập thành công,Authentication,Đăng nhập thành công,Thủ kho / Quản lý kho / Giám đốc,Chức năng,Tài khoản active tồn tại,"username=manager,password=correct","1. Mở trang login
+2. Nhập user/pass hợp lệ
+3. Bấm đăng nhập","Đăng nhập thành công, chuyển về trang chủ theo quyền",,,,
+Sai mật khẩu,Authentication,Sai mật khẩu,Thủ kho / Quản lý kho / Giám đốc,Âm,Tài khoản active tồn tại,"username=manager,password=wrong","1. Mở trang login
+2. Nhập sai mật khẩu
+3. Bấm đăng nhập","Hiển thị lỗi xác thực, không đăng nhập",,,,
+Tài khoản bị khóa,Authentication,Tài khoản bị khóa,Thủ kho / Quản lý kho / Giám đốc,Âm,User status=inactive,"username=inactive_user,password=correct",1. Login bằng tài khoản bị khóa,"Từ chối đăng nhập, hiển thị thông báo phù hợp",,,,
+Bỏ trống thông tin đăng nhập,Authentication,Bỏ trống thông tin đăng nhập,Thủ kho / Quản lý kho / Giám đốc,Kiểm tra dữ liệu,Không có,username trống hoặc password trống,"1. Để trống trường bắt buộc
+2. Submit",Hiển thị lỗi bắt buộc nhập,,,,
+Đăng xuất,Authentication,Đăng xuất,Thủ kho / Quản lý kho / Giám đốc,Chức năng,Đang đăng nhập,Không có,1. Bấm Đăng xuất,"Session bị hủy, quay về login",,,,
+Truy cập URL khi chưa login,Authentication,Truy cập URL khi chưa login,Thủ kho / Quản lý kho / Giám đốc,Bảo mật,Chưa đăng nhập,Truy cập /import,1. Gõ URL protected,Bị chuyển về login,,,,
+Admin xem menu báo cáo đầy đủ,Authorization,Admin xem menu báo cáo đầy đủ,Giám đốc,Chức năng,Đăng nhập admin,Không có,1. Vào menu Báo cáo,"Thấy các mục: tồn, nhập, xuất, nhập-xuất-tồn, audit, lời/lỗ (nếu có quyền)",,,,
+Thủ kho chỉ xem dữ liệu kho được gán,Authorization,Thủ kho chỉ xem dữ liệu kho được gán,Thủ kho,Bảo mật,Thủ kho có warehouse_id,warehouse_id khác,1. Truy cập phiếu thuộc kho khác qua URL,Bị chặn truy cập,,,,
+Manager duyệt phiếu nhập,Authorization,Manager duyệt phiếu nhập,Quản lý kho,Chức năng,Có quyền import.approve,Phiếu nhập pending,"1. Mở chi tiết phiếu
+2. Duyệt",Duyệt thành công,,,,
+Manager duyệt phiếu xuất,Authorization,Manager duyệt phiếu xuất,Quản lý kho,Chức năng,Có quyền export.approve,Phiếu xuất pending,"1. Mở chi tiết phiếu
+2. Duyệt",Duyệt thành công,,,,
+User không có quyền report.view vào report,Authorization,User không có quyền report.view vào report,Thủ kho,Bảo mật,User không có report.view,/report/movement,1. Truy cập URL trực tiếp,Bị từ chối và redirect,,,,
+User có stock_card.view truy cập thẻ kho,Authorization,User có stock_card.view truy cập thẻ kho,Thủ kho,Chức năng,Có quyền stock_card.view,Không có,1. Vào thẻ kho,Mở được trang thẻ kho,,,,
+Chặn thao tác duyệt khi không có quyền,Authorization,Chặn thao tác duyệt khi không có quyền,Thủ kho,Bảo mật,Không có import.approve,Không có,1. Gọi URL approve/import,Không thực thi duyệt,,,,
+Role-based workbench hiển thị đúng,Authorization,Role-based workbench hiển thị đúng,Thủ kho / Quản lý kho / Giám đốc,Giao diện,Đăng nhập từng role,Admin/Manager/Storekeeper,1. Vào home,Widget tác vụ phù hợp role,,,,
+Thêm sản phẩm mới,Master Data,Thêm sản phẩm mới,Quản lý kho / Giám đốc,Chức năng,Có quyền product.create,Mã SP mới,"1. Vào sản phẩm
+2. Tạo mới",Tạo thành công,,,,
+Trùng mã sản phẩm,Master Data,Trùng mã sản phẩm,Quản lý kho / Giám đốc,Kiểm tra dữ liệu,Mã đã tồn tại,code=existing,1. Tạo sản phẩm trùng mã,"Bị báo lỗi, không lưu",,,,
+Cập nhật min/max sản phẩm,Master Data,Cập nhật min/max sản phẩm,Quản lý kho / Giám đốc,Chức năng,Sản phẩm tồn tại,"min=50,max=100","1. Edit sản phẩm
+2. Lưu",Giá trị min/max cập nhật đúng,,,,
+Thêm nhà cung cấp,Master Data,Thêm nhà cung cấp,Quản lý kho / Giám đốc,Chức năng,Có quyền supplier.create,NCC mới,1. Tạo nhà cung cấp,Lưu thành công,,,,
+Kho ngừng hoạt động không hiển thị trong lựa chọn,Master Data,Kho ngừng hoạt động không hiển thị trong lựa chọn,Quản lý kho / Giám đốc,Chức năng,Có kho inactive,Kho inactive,1. Mở form tạo phiếu,Kho inactive không xuất hiện,,,,
+Loại hàng thuộc đúng sản phẩm,Master Data,Loại hàng thuộc đúng sản phẩm,Quản lý kho / Giám đốc,Kiểm tra dữ liệu,ProductType setup sẵn,Type không thuộc product,1. Add detail phiếu với type sai,Không cho lưu,,,,
+Tạo phiếu nhập thành công,Import,Tạo phiếu nhập thành công,Quản lý kho,Chức năng,Có quyền import.create,Kho + NCC + ngày,"1. Vào tạo phiếu nhập
+2. Submit","Sinh mã PN-YYYYMMDD-XXX, trạng thái pending",,,,
+Tạo phiếu nhập thiếu kho,Import,Tạo phiếu nhập thiếu kho,Quản lý kho,Kiểm tra dữ liệu,Không có,warehouse rỗng,1. Submit form thiếu kho,Báo lỗi bắt buộc chọn kho,,,,
+Thêm nhiều sản phẩm vào phiếu nhập,Import,Thêm nhiều sản phẩm vào phiếu nhập,Quản lý kho,Chức năng,Phiếu pending,2+ dòng sản phẩm,1. Add product nhiều dòng,"Lưu thành công, cập nhật total_amount",,,,
+Không cho thêm sản phẩm khi phiếu đã duyệt,Import,Không cho thêm sản phẩm khi phiếu đã duyệt,Quản lý kho,Âm,Phiếu approved,Không có,1. Add product vào phiếu approved,Bị chặn thao tác,,,,
+Xóa sản phẩm khỏi phiếu nhập,Import,Xóa sản phẩm khỏi phiếu nhập,Quản lý kho,Chức năng,Phiếu pending có detail,detail_id hợp lệ,1. Remove detail,"Xóa thành công, total_amount cập nhật",,,,
+Duyệt phiếu nhập cập nhật tồn kho,Import,Duyệt phiếu nhập cập nhật tồn kho,Quản lý kho,Chức năng,Phiếu pending có detail,qty nhập hợp lệ,1. Approve phiếu nhập,"Inventory tăng đúng, trạng thái approved",,,,
+Duyệt phiếu nhập tạo transaction,Import,Duyệt phiếu nhập tạo transaction,Quản lý kho,Chức năng,Phiếu pending có detail,Không có,1. Approve phiếu nhập,"Có dòng transactions type=import, balance_before/after đúng",,,,
+Duyệt phiếu nhập cập nhật avg import price,Import,Duyệt phiếu nhập cập nhật avg import price,Quản lý kho,Chức năng,Đã có tồn và avg price,Giá mới khác giá cũ,1. Approve phiếu nhập,avg_import_price tính bình quân gia quyền đúng,,,,
+Duyệt phiếu nhập không có sản phẩm,Import,Duyệt phiếu nhập không có sản phẩm,Quản lý kho,Âm,Phiếu không detail,Không có,1. Approve phiếu,Báo lỗi không cho duyệt,,,,
+Từ chối phiếu nhập có lý do,Import,Từ chối phiếu nhập có lý do,Quản lý kho,Chức năng,Phiếu pending,reject_reason,1. Reject phiếu,"Trạng thái cancelled, lưu reject_reason",,,,
+Từ chối phiếu nhập không nhập lý do,Import,Từ chối phiếu nhập không nhập lý do,Quản lý kho,Kiểm tra dữ liệu,Phiếu pending,reject_reason rỗng,1. Reject phiếu,Báo lỗi bắt buộc lý do,,,,
+Cảnh báo min/max xuất hiện sau duyệt phiếu nhập,Import,Cảnh báo min/max xuất hiện sau duyệt phiếu nhập,Quản lý kho,Chức năng,Mặt hàng gần/vượt ngưỡng,Nhập lượng lớn,1. Approve phiếu,Thông báo success kèm cảnh báo tồn kho,,,,
+Tạo phiếu xuất thành công,Export,Tạo phiếu xuất thành công,Quản lý kho,Chức năng,Có quyền export.create,Kho + khách hàng + ngày,1. Tạo phiếu xuất,"Sinh mã PX-YYYYMMDD-XXX, pending",,,,
+Tạo phiếu xuất thiếu kho,Export,Tạo phiếu xuất thiếu kho,Quản lý kho,Kiểm tra dữ liệu,Không có,warehouse rỗng,1. Submit thiếu kho,Báo lỗi bắt buộc,,,,
+Thêm nhiều sản phẩm vào phiếu xuất,Export,Thêm nhiều sản phẩm vào phiếu xuất,Quản lý kho,Chức năng,Phiếu pending,2+ dòng sản phẩm,1. Add products,"Lưu thành công, cập nhật tổng tiền",,,,
+Không cho thêm sản phẩm khi phiếu đã duyệt,Export,Không cho thêm sản phẩm khi phiếu đã duyệt,Quản lý kho,Âm,Phiếu approved,Không có,1. Add product vào phiếu approved,Bị chặn,,,,
+Xóa sản phẩm khỏi phiếu xuất,Export,Xóa sản phẩm khỏi phiếu xuất,Quản lý kho,Chức năng,Phiếu pending,detail_id,1. Remove detail,"Xóa thành công, cập nhật tổng",,,,
+Duyệt phiếu xuất đủ tồn,Export,Duyệt phiếu xuất đủ tồn,Quản lý kho,Chức năng,Phiếu pending đủ hàng,Không có,1. Approve phiếu,"Inventory giảm đúng, approved",,,,
+Duyệt phiếu xuất thiếu tồn,Export,Duyệt phiếu xuất thiếu tồn,Quản lý kho,Âm,Phiếu qty > tồn,Không có,1. Approve phiếu,"Báo lỗi không đủ tồn, không cập nhật tồn",,,,
+Duyệt phiếu xuất tạo transaction,Export,Duyệt phiếu xuất tạo transaction,Quản lý kho,Chức năng,Phiếu pending đủ hàng,Không có,1. Approve phiếu,"Có transaction type=export, balance đúng",,,,
+Duyệt phiếu xuất cập nhật giá vốn/lợi nhuận,Export,Duyệt phiếu xuất cập nhật giá vốn/lợi nhuận,Quản lý kho,Chức năng,detail.cost_price=0,Có avg_import_price,1. Approve phiếu,cost_price/profit được cập nhật,,,,
+Từ chối phiếu xuất có lý do,Export,Từ chối phiếu xuất có lý do,Quản lý kho,Chức năng,Phiếu pending,reject_reason,1. Reject phiếu,"Phiếu cancelled, lưu lý do",,,,
+Từ chối phiếu xuất không lý do,Export,Từ chối phiếu xuất không lý do,Quản lý kho,Kiểm tra dữ liệu,Phiếu pending,reject_reason rỗng,1. Reject phiếu,Báo lỗi bắt buộc lý do,,,,
+Cảnh báo min/max xuất hiện sau duyệt phiếu xuất,Export,Cảnh báo min/max xuất hiện sau duyệt phiếu xuất,Quản lý kho,Chức năng,Mặt hàng gần/vượt ngưỡng,Xuất làm xuống min,1. Approve phiếu,Thông báo success kèm cảnh báo tồn kho,,,,
+Báo cáo tồn kho hiển thị đầy đủ số liệu,Inventory,Báo cáo tồn kho hiển thị đầy đủ số liệu,Quản lý kho,Chức năng,Có dữ liệu inventory,Không có,1. Vào report/inventory,"Hiển thị tổng mặt hàng, tổng số lượng, dưới min, vượt max, sắp chạm ngưỡng",,,,
+Lọc tồn kho theo kho,Inventory,Lọc tồn kho theo kho,Quản lý kho,Chức năng,Có nhiều kho,warehouse_id,"1. Chọn kho
+2. Lọc",Chỉ hiện dữ liệu kho chọn,,,,
+Trạng thái dưới min hiển thị đúng,Inventory,Trạng thái dưới min hiển thị đúng,Quản lý kho,Chức năng,qty < min,Không có,1. Mở báo cáo tồn,Badge Dưới mức,,,,
+Trạng thái vượt max hiển thị đúng,Inventory,Trạng thái vượt max hiển thị đúng,Quản lý kho,Chức năng,qty > max,Không có,1. Mở báo cáo tồn,Badge Vượt mức,,,,
+Trạng thái sắp chạm ngưỡng hiển thị đúng,Inventory,Trạng thái sắp chạm ngưỡng hiển thị đúng,Quản lý kho,Chức năng,qty trong vùng cảnh báo,Không có,1. Mở báo cáo tồn,Badge Sắp chạm ngưỡng,,,,
+Cảnh báo icon ở menu báo cáo,Inventory,Cảnh báo icon ở menu báo cáo,Quản lý kho,Giao diện,Có mặt hàng near/over,Không có,1. Quan sát menu báo cáo,Hiện icon cảnh báo phù hợp,,,,
+Cảnh báo icon ở menu thẻ kho cho thủ kho,Inventory,Cảnh báo icon ở menu thẻ kho cho thủ kho,Thủ kho,Giao diện,Có cảnh báo trong kho gán,Không có,"1. Login thủ kho
+2. Quan sát menu",Hiện icon cảnh báo,,,,
+Không có cảnh báo thì trạng thái bình thường,Inventory,Không có cảnh báo thì trạng thái bình thường,Quản lý kho,Chức năng,Dữ liệu trong ngưỡng,Không có,1. Mở báo cáo tồn,Badge Bình thường,,,,
+Xem thẻ kho theo kho + sản phẩm,Stock Card,Xem thẻ kho theo kho + sản phẩm,Quản lý kho,Chức năng,Có giao dịch,"warehouse_id, product_id","1. Chọn kho + sản phẩm
+2. Xem",Hiển thị lịch sử giao dịch đúng,,,,
+Lọc thẻ kho theo ngày,Stock Card,Lọc thẻ kho theo ngày,Quản lý kho,Chức năng,Có giao dịch nhiều ngày,start/end date,1. Chọn khoảng ngày,Chỉ hiện giao dịch trong khoảng,,,,
+Hiển thị tồn trước/tồn sau đúng,Stock Card,Hiển thị tồn trước/tồn sau đúng,Quản lý kho,Chức năng,Có giao dịch import/export,Không có,1. Kiểm tra từng dòng,balance_before/balance_after khớp logic,,,,
+Link số chứng từ mở đúng chi tiết phiếu,Stock Card,Link số chứng từ mở đúng chi tiết phiếu,Quản lý kho,Chức năng,Có reference import/export,Không có,1. Bấm mã chứng từ,Mở trang detail đúng phiếu,,,,
+Storekeeper xem toàn bộ thẻ kho trong kho được gán,Stock Card,Storekeeper xem toàn bộ thẻ kho trong kho được gán,Thủ kho,Chức năng,Storekeeper có warehouse_id,Không có,"1. Login thủ kho
+2. Vào thẻ kho",Hiển thị thẻ kho các sản phẩm của kho đó,,,,
+Storekeeper không xem kho khác,Stock Card,Storekeeper không xem kho khác,Thủ kho,Bảo mật,Storekeeper warehouse A,warehouse B,1. Gọi URL kho B,Không hiển thị dữ liệu kho B,,,,
+Hiển thị cảnh báo theo sản phẩm trên thẻ kho,Stock Card,Hiển thị cảnh báo theo sản phẩm trên thẻ kho,Quản lý kho,Giao diện,Có warning detail,Không có,1. Mở thẻ kho,Hiện thông điệp near/over min/max,,,,
+Xuất báo cáo (In/PDF) từ thẻ kho,Stock Card,Xuất báo cáo (In/PDF) từ thẻ kho,Quản lý kho,Giao diện,Mở thẻ kho,Không có,1. Bấm nút Xuất báo cáo,Mở dialog print/browser print,,,,
+Báo cáo nhập kho theo kỳ,Reports,Báo cáo nhập kho theo kỳ,Quản lý kho,Chức năng,Có phiếu nhập,start/end,"1. Vào report/import
+2. Lọc ngày",Danh sách + stats đúng,,,,
+Báo cáo xuất kho theo kỳ,Reports,Báo cáo xuất kho theo kỳ,Quản lý kho,Chức năng,Có phiếu xuất,start/end,"1. Vào report/export
+2. Lọc ngày",Danh sách + stats đúng,,,,
+Báo cáo lời/lỗ theo kỳ,Reports,Báo cáo lời/lỗ theo kỳ,Quản lý kho,Chức năng,Có export approved,start/end,1. Vào report/profitLoss,"Hiển thị doanh thu, giá vốn, lợi nhuận",,,,
+Báo cáo nhập-xuất-tồn theo tháng mặc định,Reports,Báo cáo nhập-xuất-tồn theo tháng mặc định,Quản lý kho,Chức năng,Có transaction,period=month,1. Vào report/movement,Tự chọn đầu-cuối tháng hiện tại,,,,
+Báo cáo nhập-xuất-tồn theo tuần,Reports,Báo cáo nhập-xuất-tồn theo tuần,Quản lý kho,Chức năng,Có transaction,period=week,1. Chọn period week,Khoảng ngày theo tuần hiện tại,,,,
+Báo cáo nhập-xuất-tồn theo quý,Reports,Báo cáo nhập-xuất-tồn theo quý,Quản lý kho,Chức năng,Có transaction,period=quarter,1. Chọn period quarter,Khoảng ngày theo quý hiện tại,,,,
+Báo cáo nhập-xuất-tồn theo năm,Reports,Báo cáo nhập-xuất-tồn theo năm,Quản lý kho,Chức năng,Có transaction,period=year,1. Chọn period year,Khoảng ngày theo năm hiện tại,,,,
+Lọc movement theo kho,Reports,Lọc movement theo kho,Quản lý kho,Chức năng,Nhiều kho có dữ liệu,warehouse_id,"1. Chọn kho
+2. Lọc",Chỉ hiện dữ liệu kho đó,,,,
+Lọc movement theo từ khóa mã/tên,Reports,Lọc movement theo từ khóa mã/tên,Quản lý kho,Chức năng,Có nhiều sản phẩm,keyword,"1. Nhập keyword
+2. Lọc",Chỉ hiện dòng phù hợp,,,,
+Drill-down movement -> thẻ kho,Reports,Drill-down movement -> thẻ kho,Quản lý kho,Chức năng,Có dòng movement,Bấm nút Thẻ kho,1. Bấm Thẻ kho,Mở stock_card đúng warehouse/product/date,,,,
+Trạng thái trong movement dựa theo closing_qty,Reports,Trạng thái trong movement dựa theo closing_qty,Quản lý kho,Chức năng,Có min/max,Không có,1. Xem trạng thái từng dòng,Label đúng theo closing qty,,,,
+Kiểm tra công thức tồn đầu/cuối kỳ,Reports,Kiểm tra công thức tồn đầu/cuối kỳ,Quản lý kho,Chức năng,Có transaction trước/sau kỳ,Không có,1. Đối chiếu thủ công,Opening/Closing đúng theo công thức,,,,
+Sinh log khi tạo phiếu nhập,Audit Log,Sinh log khi tạo phiếu nhập,Quản lý kho,Chức năng,Có quyền import.create,Tạo PN,"1. Tạo phiếu nhập
+2. Vào report/audit",Có bản ghi create_import,,,,
+Sinh log khi tạo phiếu xuất,Audit Log,Sinh log khi tạo phiếu xuất,Quản lý kho,Chức năng,Có quyền export.create,Tạo PX,"1. Tạo phiếu xuất
+2. Vào report/audit",Có bản ghi create_export,,,,
+Sinh log khi duyệt phiếu nhập,Audit Log,Sinh log khi duyệt phiếu nhập,Quản lý kho,Chức năng,Có PN pending,Approve PN,"1. Duyệt PN
+2. Xem audit",Có bản ghi approve_import,,,,
+Sinh log khi duyệt phiếu xuất,Audit Log,Sinh log khi duyệt phiếu xuất,Quản lý kho,Chức năng,Có PX pending,Approve PX,"1. Duyệt PX
+2. Xem audit",Có bản ghi approve_export,,,,
+Sinh log khi từ chối phiếu,Audit Log,Sinh log khi từ chối phiếu,Quản lý kho,Chức năng,Có phiếu pending,Reject lý do,"1. Reject phiếu
+2. Xem audit",Có log reject_import/reject_export + metadata reason,,,,
+Sinh log khi xóa phiếu,Audit Log,Sinh log khi xóa phiếu,Quản lý kho,Chức năng,Phiếu pending,Delete phiếu,"1. Xóa phiếu
+2. Xem audit",Có log delete_import/delete_export,,,,
+Lọc audit theo action/entity/date,Audit Log,Lọc audit theo action/entity/date,Quản lý kho,Chức năng,Audit có dữ liệu,Filter combo,1. Chọn bộ lọc,Chỉ hiện log theo filter,,,,
+Quyền truy cập audit log,Audit Log,Quyền truy cập audit log,Thủ kho,Bảo mật,User không có report.view,/report/audit,1. Truy cập URL,Bị chặn truy cập,,,,
+Hiển thị block công việc ưu tiên trên Home,Workbench,Hiển thị block công việc ưu tiên trên Home,Thủ kho / Quản lý kho / Giám đốc,Giao diện,Đăng nhập,Không có,1. Vào Home,Thấy section Bảng công việc của bạn,,,,
+Manager thấy card phiếu chờ duyệt,Workbench,Manager thấy card phiếu chờ duyệt,Quản lý kho,Giao diện,Có pending,Không có,1. Login manager,Card pending import/export hiển thị đúng số,,,,
+Storekeeper thấy card liên quan kho của mình,Workbench,Storekeeper thấy card liên quan kho của mình,Thủ kho,Giao diện,Storekeeper có warehouse,Không có,1. Login storekeeper,Hiển thị card cảnh báo kho + giao dịch hôm nay,,,,
+Quick links điều hướng đúng module,Workbench,Quick links điều hướng đúng module,Thủ kho / Quản lý kho / Giám đốc,Giao diện,Có quyền tương ứng,Bấm từng quick link,1. Click quick link,Đi đến đúng URL,,,,
+Giảm số click cho tác vụ thường dùng,Workbench,Giảm số click cho tác vụ thường dùng,Quản lý kho,Khả dụng,Không có,Tác vụ duyệt phiếu,1. Từ home vào module qua quick link,<=2 thao tác đến màn cần xử lý,,,,
+Không hiển thị quick link ngoài quyền,Workbench,Không hiển thị quick link ngoài quyền,Thủ kho / Quản lý kho / Giám đốc,Bảo mật/Giao diện,Role giới hạn,Không có,1. Login role thấp,Không thấy link không có quyền,,,,
