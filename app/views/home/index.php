@@ -96,6 +96,43 @@
     <?php endif; ?>
 </div>
 
+<!-- Role Workbench -->
+<?php if (!empty($workbench)): ?>
+    <div class="row row-cards mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><?= htmlspecialchars($workbench['title']) ?></h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3"><?= htmlspecialchars($workbench['subtitle']) ?></p>
+                    <div class="row g-3 mb-3">
+                        <?php foreach (($workbench['cards'] ?? []) as $task): ?>
+                            <div class="col-md-3 col-sm-6">
+                                <a href="<?= BASE_URL . $task['url'] ?>" class="card card-link text-decoration-none">
+                                    <div class="card-body">
+                                        <div class="text-muted"><?= htmlspecialchars($task['label']) ?></div>
+                                        <div class="h1 mb-0 text-<?= htmlspecialchars($task['color']) ?>"><?= number_format($task['count']) ?></div>
+                                    </div>
+                                </a>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php if (!empty($workbench['quickLinks'])): ?>
+                        <div class="d-flex flex-wrap gap-2">
+                            <?php foreach ($workbench['quickLinks'] as $link): ?>
+                                <a href="<?= BASE_URL . $link['url'] ?>" class="btn btn-outline-primary">
+                                    <i class="<?= htmlspecialchars($link['icon']) ?> me-1"></i><?= htmlspecialchars($link['label']) ?>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 <div class="row row-deck row-cards">
     <!-- Cảnh báo tồn kho thấp -->
     <div class="col-lg-6">

@@ -235,6 +235,9 @@
                                         <a class="dropdown-item" href="<?= BASE_URL ?>report/movement">
                                             <i class="ti ti-table-options me-2"></i>Báo cáo nhập-xuất-tồn
                                         </a>
+                                        <a class="dropdown-item" href="<?= BASE_URL ?>report/audit">
+                                            <i class="ti ti-history me-2"></i>Audit log
+                                        </a>
                                     <?php endif; ?>
                                     <?php if (Auth::hasPermission('report.profit_loss')): ?>
                                         <a class="dropdown-item" href="<?= BASE_URL ?>report/profitLoss">

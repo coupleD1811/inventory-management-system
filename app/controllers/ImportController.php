@@ -6,6 +6,7 @@ class ImportController extends Controller
     private $warehouseModel;
     private $supplierModel;
     private $workshopModel;
+    private $auditLogModel;
 
     public function __construct()
     {
@@ -14,6 +15,7 @@ class ImportController extends Controller
         $this->warehouseModel = $this->model('Warehouse');
         $this->supplierModel = $this->model('Supplier');
         $this->workshopModel = $this->model('Workshop');
+        $this->auditLogModel = $this->model('AuditLog');
     }
 
     public function index()
@@ -94,7 +96,16 @@ class ImportController extends Controller
                 'created_by' => Auth::id()
             ];
 
-            if ($this->importModel->create($data)) {
+            $newImportId = $this->importModel->create($data);
+            if ($newImportId) {
+                $this->logAudit(
+                    'create_import',
+                    'import',
+                    $newImportId,
+                    'Tạo phiếu nhập ' . $code,
+                    $code,
+                    ['warehouse_id' => (int)$warehouseId, 'import_date' => $importDate]
+                );
                 $_SESSION['success'] = 'Tạo phiếu nhập thành công! Mã phiếu: ' . $code;
                 $this->redirect('import');
             } else {
@@ -217,6 +228,13 @@ class ImportController extends Controller
         }
 
         if ($this->importModel->delete($id)) {
+            $this->logAudit(
+                'delete_import',
+                'import',
+                (int)$id,
+                'Xóa phiếu nhập ' . ($import['code'] ?? ('#' . $id)),
+                $import['code'] ?? null
+            );
             $_SESSION['success'] = 'Xóa phiếu nhập thành công!';
         } else {
             $_SESSION['error'] = 'Có lỗi xảy ra, vui lòng thử lại!';
@@ -289,6 +307,14 @@ class ImportController extends Controller
                 // Update total amount
                 $total = $importDetailModel->getTotalAmount($id);
                 $this->importModel->update($id, ['total_amount' => $total]);
+                $this->logAudit(
+                    'update_import_products',
+                    'import',
+                    (int)$id,
+                    'Thêm sản phẩm vào phiếu nhập ' . ($import['code'] ?? ('#' . $id)),
+                    $import['code'] ?? null,
+                    ['added_rows' => $successCount]
+                );
                 
                 $_SESSION['success'] = "Đã thêm $successCount sản phẩm thành công!";
             } else {
@@ -315,6 +341,14 @@ class ImportController extends Controller
             // Update total amount
             $total = $importDetailModel->getTotalAmount($id);
             $this->importModel->update($id, ['total_amount' => $total]);
+            $this->logAudit(
+                'remove_import_product',
+                'import',
+                (int)$id,
+                'Xóa sản phẩm khỏi phiếu nhập ' . ($import['code'] ?? ('#' . $id)),
+                $import['code'] ?? null,
+                ['detail_id' => (int)$detailId]
+            );
             
             $_SESSION['success'] = 'Xóa sản phẩm thành công!';
         } else {
@@ -420,6 +454,14 @@ class ImportController extends Controller
                 }
                 $message .= ' Cảnh báo tồn kho: ' . implode('; ', $alertTexts) . '.';
             }
+            $this->logAudit(
+                'approve_import',
+                'import',
+                (int)$id,
+                'Duyệt phiếu nhập ' . ($import['code'] ?? ('#' . $id)),
+                $import['code'] ?? null,
+                ['items' => count($details), 'alerts' => $alerts]
+            );
             $_SESSION['success'] = $message;
         } catch (Exception $e) {
             $_SESSION['error'] = 'Có lỗi xảy ra: ' . $e->getMessage();
@@ -470,11 +512,41 @@ class ImportController extends Controller
             'approved_at' => date('Y-m-d H:i:s'),
             'reject_reason' => $rejectReason
         ])) {
+            $this->logAudit(
+                'reject_import',
+                'import',
+                (int)$id,
+                'Từ chối phiếu nhập ' . ($import['code'] ?? ('#' . $id)),
+                $import['code'] ?? null,
+                ['reason' => $rejectReason]
+            );
             $_SESSION['success'] = 'Đã từ chối phiếu nhập!';
         } else {
             $_SESSION['error'] = 'Có lỗi xảy ra, vui lòng thử lại!';
         }
 
         $this->redirect('import');
+    }
+
+    private function logAudit($action, $entityType, $entityId, $description, $referenceCode = null, $metadata = [])
+    {
+        if (!$this->auditLogModel) {
+            return;
+        }
+
+        $user = Auth::user();
+        $this->auditLogModel->log([
+            'user_id' => Auth::id(),
+            'username' => $user['username'] ?? null,
+            'full_name' => $user['full_name'] ?? null,
+            'role_name' => $user['role_name'] ?? null,
+            'action' => $action,
+            'entity_type' => $entityType,
+            'entity_id' => $entityId,
+            'reference_code' => $referenceCode,
+            'description' => $description,
+            'metadata' => $metadata,
+            'ip_address' => $_SERVER['REMOTE_ADDR'] ?? null
+        ]);
     }
 }
